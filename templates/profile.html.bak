@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CARRFS | Your Health Profile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0f1e;
+            --card: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.1);
+            --accent: #3b82f6;
+            --accent2: #8b5cf6;
+            --text: #f1f5f9;
+            --muted: #64748b;
+            --success: #22c55e;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            background-image: radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
+        }
+
+        .brand {
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .headline {
+            font-size: 1.75rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 0.4rem;
+            line-height: 1.2;
+        }
+
+        .sub {
+            color: var(--muted);
+            text-align: center;
+            font-size: 0.9rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 600px;
+            backdrop-filter: blur(20px);
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .section-label:first-child {
+            margin-top: 0;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .field-group label {
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.7rem 1rem;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--accent);
+        }
+
+        select option {
+            background: #1e293b;
+        }
+
+        /* Toggle */
+        .toggle-row {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 0.2rem;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 0.6rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .toggle-btn.active {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        /* Disease checkboxes */
+        .disease-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-top: 0.2rem;
+        }
+
+        .disease-box {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.6rem 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .disease-box:hover {
+            border-color: rgba(139, 92, 246, 0.4);
+        }
+
+        .disease-box.selected {
+            background: rgba(139, 92, 246, 0.12);
+            border-color: #8b5cf6;
+        }
+
+        .disease-box input {
+            display: none;
+        }
+
+        .chk-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+            border: 1.5px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .disease-box.selected .chk-icon {
+            background: #8b5cf6;
+            border-color: #8b5cf6;
+        }
+
+        .chk-icon svg {
+            display: none;
+        }
+
+        .disease-box.selected .chk-icon svg {
+            display: block;
+        }
+
+        .disease-label {
+            font-size: 0.82rem;
+            color: var(--muted);
+        }
+
+        .disease-box.selected .disease-label {
+            color: var(--text);
+        }
+
+        /* Submit */
+        .submit-btn {
+            width: 100%;
+            padding: 0.9rem;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 2rem;
+            font-family: inherit;
+            transition: opacity 0.2s, transform 0.15s;
+            letter-spacing: 0.5px;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .note {
+            color: var(--muted);
+            font-size: 0.78rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="brand">CARRFS</div>
+    <h1 class="headline">Tell us about yourself</h1>
+    <p class="sub">Your profile is used to generate personalised AQI health precautions.<br>This data stays on your
+        device only.</p>
+
+    <div class="card">
+        <div class="section-label">Basic Details</div>
+        <div class="input-row">
+            <div class="field-group">
+                <label>Full Name</label>
+                <input type="text" id="name" placeholder="e.g. Rahul Sharma">
+            </div>
+            <div class="field-group">
+                <label>Age</label>
+                <input type="number" id="age" placeholder="e.g. 28" min="1" max="120">
+            </div>
+        </div>
+
+        <div class="section-label" style="margin-top:1.2rem;">Gender</div>
+        <div class="toggle-row" id="genderGroup">
+            <button class="toggle-btn" onclick="selectToggle('genderGroup',this,'male')">Male</button>
+            <button class="toggle-btn" onclick="selectToggle('genderGroup',this,'female')">Female</button>
+            <button class="toggle-btn" onclick="selectToggle('genderGroup',this,'other')">Other</button>
+        </div>
+
+        <div class="section-label" style="margin-top:1.2rem;">Do you smoke?</div>
+        <div class="toggle-row" id="smokerGroup">
+            <button class="toggle-btn" onclick="selectToggle('smokerGroup',this,'Yes')">Yes, I smoke</button>
+            <button class="toggle-btn active" onclick="selectToggle('smokerGroup',this,'No')" data-val="No">No, I
+                don't</button>
+        </div>
+
+        <div class="section-label" style="margin-top:1.5rem;">Respiratory / Health Conditions</div>
+        <p style="font-size:0.78rem;color:var(--muted);margin-bottom:0.7rem;">Select all that apply</p>
+        <div class="disease-grid" id="diseaseGrid">
+        </div>
+    </div>
+
+    <button class="submit-btn" onclick="saveProfile()">Save Profile & Continue →</button>
+    <p class="note">You can update your profile at any time from the dashboard.</p>
+
+    <script>
+        const DISEASES = [
+            "Asthma", "COPD", "Chronic Bronchitis", "Heart Disease",
+            "Rhinitis / Sinusitis", "Lung Cancer", "Hypertension",
+            "Pulmonary Fibrosis", "Diabetes", "None of the above"
+        ];
+
+        // Render disease checkboxes
+        const grid = document.getElementById('diseaseGrid');
+        DISEASES.forEach(d => {
+            const box = document.createElement('div');
+            box.className = 'disease-box';
+            box.dataset.val = d;
+            box.innerHTML = `
+                <div class="chk-icon">
+                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                        <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <span class="disease-label">${d}</span>
+            `;
+            box.addEventListener('click', () => {
+                if (d === 'None of the above') {
+                    // deselect all others
+                    grid.querySelectorAll('.disease-box').forEach(b => b.classList.remove('selected'));
+                    box.classList.add('selected');
+                } else {
+                    // deselect "None"
+                    grid.querySelectorAll('.disease-box').forEach(b => {
+                        if (b.dataset.val === 'None of the above') b.classList.remove('selected');
+                    });
+                    box.classList.toggle('selected');
+                }
+            });
+            grid.appendChild(box);
+        });
+
+        // Toggle group selection
+        let genderVal = null, smokerVal = 'No';
+        function selectToggle(groupId, btn, val) {
+            document.getElementById(groupId).querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            btn.dataset.val = val;
+            if (groupId === 'genderGroup') genderVal = val;
+            if (groupId === 'smokerGroup') smokerVal = val;
+        }
+
+        async function saveProfile() {
+            const name = document.getElementById('name').value.trim();
+            const age = document.getElementById('age').value;
+            if (!name) { alert('Please enter your name.'); return; }
+            if (!age) { alert('Please enter your age.'); return; }
+            if (!genderVal) { alert('Please select your gender.'); return; }
+
+            const conditions = [...document.querySelectorAll('.disease-box.selected')]
+                .map(b => b.dataset.val)
+                .filter(v => v !== 'None of the above');
+
+            const res = await fetch('/save-profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, age, gender: genderVal, smoker: smokerVal, conditions })
+            });
+            const data = await res.json();
+            if (data.status === 'ok') window.location.href = '/dashboard';
+        }
+    </script>
+</body>
+
+</html>

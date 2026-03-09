@@ -1,0 +1,2844 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | CARRFS</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- JS Libraries -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <!-- Premium Animation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <style>
+        :root {
+            --bg: #030712;
+            --glass: rgba(30, 41, 59, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-glow: rgba(59, 130, 246, 0.1);
+            --text: #f8fafc;
+            --muted: #f1f5f9;
+            /* Brightened for absolute clarity */
+            --blue: #3b82f6;
+            --purple: #8b5cf6;
+            --font-hdr: 'Outfit', sans-serif;
+            --font-main: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        html,
+        body {
+            overflow-x: hidden;
+            max-width: 100vw;
+            width: 100%;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.08) 0px, transparent 50%);
+        }
+
+        .atmosphere {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: drift 20s infinite alternate ease-in-out;
+        }
+
+        @keyframes drift {
+            from {
+                transform: translate(0, 0) scale(1);
+            }
+
+            to {
+                transform: translate(100px, 50px) scale(1.1);
+            }
+        }
+
+
+        /* Nav */
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 4rem;
+            height: 80px;
+            background: #030712;
+            /* Solid dark background */
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-family: var(--font-hdr);
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+
+        .logo-text {
+            background: linear-gradient(135deg, #fff 30%, var(--blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-left: -1.2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #fff !important;
+            /* Force bright white */
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--blue);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #fff;
+        }
+
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 0.5rem 1.25rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .profile-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--blue);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Main Grid */
+        .page {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 2.5rem;
+            padding: 2rem 4rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            min-height: 100vh;
+            align-items: stretch;
+            /* Allow sidebar to match right-panel height */
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            min-width: 0;
+            width: 100%;
+            position: relative;
+        }
+
+        .left-panel {
+            position: sticky;
+            top: 100px;
+            /* Below the nav */
+            height: auto;
+            align-self: start;
+            /* Maintain stickiness anchor */
+            display: flex;
+            flex-direction: column;
+            background: #0f172a !important;
+            border-radius: 24px !important;
+            z-index: 100;
+            box-shadow: 0 15px 50px -10px rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(59, 130, 246, 0.2) !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: none !important;
+        }
+
+        /* Extend sidebar content to match pollutants grid height visually */
+        #persistentPanel {
+            height: stretch;
+            min-height: 100%;
+        }
+
+        .left-panel .card {
+            background: #0f172a !important;
+            border: none !important;
+            padding: 1.5rem !important;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .left-panel .card label {
+            color: #ffffff !important;
+            /* Forced bright white */
+            font-weight: 800 !important;
+            /* Increased for absolute clarity */
+            font-size: 0.95rem !important;
+            margin-bottom: 0.75rem !important;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .card {
+            background: #030712;
+            /* Solid dark */
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 1.75rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+            transform: translateY(-4px);
+        }
+
+        .card-title {
+            font-family: var(--font-hdr);
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #fff;
+            /* Max contrast */
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .field-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #fff;
+            /* Bright white for visibility */
+            margin-bottom: 0.5rem;
+            margin-top: 1.2rem;
+        }
+
+        /* Choices.js Overrides */
+        /* Choices visibility fix */
+        .choices__list--dropdown {
+            background-color: #111827 !important;
+            border-color: var(--border) !important;
+            border-radius: 14px !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .choices__item--selectable {
+            padding: 10px 15px !important;
+            font-size: 0.9rem !important;
+            color: #fff !important;
+        }
+
+        .choices__item--selectable.is-highlighted {
+            background-color: var(--blue) !important;
+        }
+
+        .choices {
+            margin-bottom: 1.25rem;
+            transition: all 0.3s;
+        }
+
+        .choices__label {
+            color: #fff !important;
+            /* Pure white for labels */
+            font-weight: 600 !important;
+            margin-bottom: 0.5rem !important;
+            display: block;
+            font-size: 0.85rem !important;
+            letter-spacing: 0.5px;
+        }
+
+        .choices__inner {
+            background: #111827 !important;
+            border: 1px solid #475569 !important;
+            /* Brighter slate border */
+            border-radius: 12px !important;
+            color: #fff !important;
+            min-height: 52px !important;
+            transition: border-color 0.3s;
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem !important;
+        }
+
+        .choices.is-focused .choices__inner {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Buttons */
+        .predict-btn {
+            width: 100%;
+            padding: 1.25rem;
+            margin-top: auto;
+            background: linear-gradient(135deg, #3b82f6, #6366f1) !important;
+            /* Vibrant gradient as requested */
+            color: #fff !important;
+            border: none !important;
+            border-radius: 14px !important;
+            font-weight: 800 !important;
+            /* Extra bold */
+            font-size: 1rem !important;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5) !important;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .predict-btn:hover {
+            background: #3b82f6 !important;
+            transform: translateY(-2px);
+        }
+
+        .predict-btn:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 15px 30px -5px rgba(59, 130, 246, 0.5);
+        }
+
+        /* AQI Hero */
+        .aqi-hero {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 32px;
+            padding: 3.5rem;
+            position: relative;
+            overflow: hidden;
+            display: none;
+            border: 1px solid var(--glass-border);
+        }
+
+        .aqi-number {
+            font-family: var(--font-hdr);
+            font-size: 5.2rem;
+            /* Reduced per request */
+            font-weight: 900;
+            letter-spacing: -3px;
+            background: linear-gradient(to bottom, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .aqi-severity {
+            font-family: var(--font-hdr);
+            font-size: 1.1rem;
+            font-weight: 800;
+            padding: 0.5rem 1.5rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            margin-top: 1rem;
+        }
+
+        /* Pollutants */
+        .pollutants {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem 1.5rem;
+            /* Increased vertical padding */
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: all 0.3s;
+            min-height: 160px;
+            /* Increased vertical height */
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--blue);
+            transform: scale(1.02);
+        }
+
+        .stat-card .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Catchy card highlights */
+        .stat-card.pm25 {
+            border-bottom: 3px solid #3b82f6;
+        }
+
+        .stat-card.pm10 {
+            border-bottom: 3px solid #6366f1;
+        }
+
+        .stat-card.temp {
+            border-bottom: 3px solid #f97316;
+        }
+
+        .stat-card.hum {
+            border-bottom: 3px solid #06b6d4;
+        }
+
+        .stat-card .stat-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.75rem;
+            color: var(--muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .stat-card .stat-unit {
+            font-size: 0.65rem;
+            color: #fff;
+            /* Increased visibility */
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        /* Precautions */
+        .precautions-card {
+            display: none;
+            grid-column: 1 / -1;
+            margin-top: 1.5rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            width: 100%;
+        }
+
+        .prec-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .prec-title {
+            font-family: var(--font-hdr);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .prec-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .prec-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.3rem 1.6rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-left: 5px solid var(--purple);
+            border-radius: 16px;
+            font-size: 0.95rem;
+            color: #f1f5f9;
+            line-height: 1.6;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .prec-item:hover {
+            background: rgba(139, 92, 246, 0.1);
+            transform: translateX(8px);
+            border-color: var(--purple);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.15);
+        }
+
+        .prec-bullet {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--purple);
+            margin-top: -1px;
+            flex-shrink: 0;
+        }
+
+        /* Loading - Centered AQI Turbine Flow */
+        .loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            padding: 3rem 1rem;
+            width: 100%;
+        }
+
+        .turbine-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Clean, spinning turbine core */
+        .turbine-core {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 50%;
+            border: 2px dashed rgba(59, 130, 246, 0.6);
+            animation: spin-turbine 4s linear infinite;
+        }
+
+        /* Outer flowing rings to simulate air movement */
+        .air-flow-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 1px solid transparent;
+            border-top-color: rgba(96, 165, 250, 0.8);
+            border-bottom-color: rgba(139, 92, 246, 0.8);
+            animation: spin-flow 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        .air-flow-ring:nth-child(2) {
+            width: 70%;
+            height: 70%;
+            animation-duration: 1.5s;
+            animation-direction: reverse;
+        }
+
+        @keyframes spin-turbine {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin-flow {
+            0% {
+                transform: rotate(0deg) scale(0.9);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: rotate(180deg) scale(1.05);
+                opacity: 1;
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+            }
+
+            100% {
+                transform: rotate(360deg) scale(0.9);
+                opacity: 0.5;
+            }
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #fff;
+            /* High visibility */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Hero Overhaul Refinement */
+        .hero-banner {
+            position: relative;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 32px;
+            padding: 2.5rem 3rem;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            min-height: 420px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-top-right {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .hero-season-text {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .hero-time-text {
+            font-size: 0.75rem;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .hero-main-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            margin: 1.5rem 0;
+        }
+
+        .hero-left-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .hero-right-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 1.5rem;
+        }
+
+        .aqi-unit-tag {
+            font-size: 1rem;
+            color: var(--muted);
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        /* Range bar and severity styles defined below */
+
+        .monuments-bg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.9), transparent);
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .silhouette {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            background-repeat: repeat-x;
+            background-size: 1400px 150px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1400 150'%3E%3Cpath d='M0,150 L0,120 L20,120 L20,110 L40,110 L40,120 L60,120 L60,150 Z M100,150 L100,80 L130,80 L130,150 Z M180,150 L180,100 Q210,80 240,100 L240,150 Z M300,150 L300,60 L330,60 L330,150 Z M380,150 L380,110 L410,90 L440,110 L440,150 Z M520,150 L520,70 Q560,40 600,70 L600,150 Z M680,150 L680,30 L720,30 L720,150 Z M800,150 L800,90 L840,90 Q860,60 880,90 L880,150 Z M950,150 L950,110 L990,110 L990,150 Z M1050,150 L1050,80 Q1100,50 1150,80 L1150,150 Z M1230,150 L1230,50 L1270,50 L1270,150 Z M1330,150 L1330,100 L1370,100 L1370,150 Z' fill='white' fill-opacity='0.12'/%3E%3C/svg%3E");
+            z-index: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .live-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(239, 68, 68, 0.15);
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #ef4444;
+            /* backdrop-filter: blur(5px); Removed */
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        .hero-present-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.2rem;
+        }
+
+        .hero-station-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 0.4rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            max-width: 420px;
+            /* Allow full name - wraps to next line */
+            word-break: break-word;
+            white-space: normal;
+            line-height: 1.3;
+        }
+
+        .aqi-hero-val {
+            font-size: 5rem;
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -2px;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: linear-gradient(to bottom, #fff, #cbd5e1);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-meta {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+
+        .severity-hero-box {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 0.75rem 1.5rem;
+            /* Reduced padding */
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            text-align: center;
+            backdrop-filter: blur(20px);
+            min-width: 140px;
+            /* Reduced width */
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .severity-hero-label {
+            font-size: 0.6rem;
+            /* Smaller */
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            margin-bottom: 0.1rem;
+        }
+
+        .severity-hero-text {
+            font-size: 1.3rem;
+            /* Reduced font size */
+            font-weight: 800;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            /* Changed style */
+        }
+
+        /* Premium Range Bar Logic */
+        .hero-bottom-row {
+            position: relative;
+            z-index: 2;
+            margin-top: -0.5rem;
+            /* Moved up from 1rem */
+        }
+
+        .range-bar-container {
+            width: 100%;
+        }
+
+        .range-track-premium {
+            height: 14px;
+            background: linear-gradient(to right,
+                    #16a34a 0%,
+                    /* Good */
+                    #65a30d 16.6%,
+                    /* Satisfactory */
+                    #d97706 33.3%,
+                    /* Moderate */
+                    #ea580c 50%,
+                    /* Poor */
+                    #dc2626 66.6%,
+                    /* Very Poor */
+                    #7c3aed 100%);
+            /* Severe */
+            border-radius: 10px;
+            position: relative;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        .range-marker-premium {
+            position: absolute;
+            top: 50%;
+            left: 0%;
+            transform: translate(-50%, -50%);
+            width: 22px;
+            height: 22px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 18px rgba(255, 255, 255, 0.9), 0 0 40px rgba(255, 255, 255, 0.4);
+            border: 3px solid rgba(0, 0, 0, 0.3);
+            transition: left 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 5;
+        }
+
+        .range-labels-premium {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            padding: 0 2px;
+        }
+
+        .range-labels-premium span {
+            font-size: 0.62rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex: 1;
+            text-align: center;
+        }
+
+        /* Health Advice & Cigarettes */
+        .health-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .advice-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            /* Slightly more padding for full-width */
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            width: 100%;
+            /* Ensure full width */
+        }
+
+        .cigarette-box {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .cigs-val {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #fca311;
+            line-height: 1;
+        }
+
+        .cigs-label {
+            font-size: 0.85rem;
+            color: var(--muted);
+            line-height: 1.4;
+        }
+
+        .cigs-meta-top {
+            display: flex;
+            align-items: center;
+            font-size: 0.7rem;
+            color: var(--muted);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .cigs-meta-top b {
+            color: #ef4444;
+            margin-left: 0.4rem;
+            font-size: 0.85rem;
+        }
+
+        .cig-suggestion {
+            margin-top: 1.5rem;
+            padding: 1rem 1.25rem;
+            background: rgba(252, 163, 17, 0.05);
+            border: 1px dashed rgba(252, 163, 17, 0.3);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.85rem;
+            color: #fca311;
+            animation: fadeIn 0.5s ease-out;
+            line-height: 1.4;
+        }
+
+        /* Recommendations List */
+        .rec-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .rec-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            padding: 1.2rem;
+            border-radius: 18px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rec-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--blue);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
+        }
+
+        .pulse-high {
+            animation: glow-pulse-red 2s infinite alternate;
+            border-color: #ef444455 !important;
+        }
+
+        .pulse-warning {
+            animation: glow-pulse-orange 2s infinite alternate;
+            border-color: #f59e0b55 !important;
+        }
+
+        .pulse-safe {
+            animation: glow-pulse-green 2s infinite alternate;
+            border-color: #10b98155 !important;
+        }
+
+        @keyframes glow-pulse-red {
+            from {
+                box-shadow: 0 0 5px rgba(239, 68, 68, 0.2);
+            }
+
+            to {
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+            }
+        }
+
+        @keyframes glow-pulse-orange {
+            from {
+                box-shadow: 0 0 5px rgba(245, 158, 11, 0.2);
+            }
+
+            to {
+                box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+            }
+        }
+
+        @keyframes glow-pulse-green {
+            from {
+                box-shadow: 0 0 5px rgba(16, 185, 129, 0.1);
+            }
+
+            to {
+                box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+            }
+        }
+
+        .rotate-critical {
+            animation: spin 3s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .rec-item i {
+            margin-bottom: 0.75rem;
+            color: var(--blue);
+        }
+
+        .rec-item .rec-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .rec-item .rec-status {
+            font-size: 0.7rem;
+            color: var(--muted);
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        /* Prevent Problems Tabs */
+        .problems-viewer {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            overflow: hidden;
+            margin-top: 2rem;
+            padding: 2.5rem;
+            /* Add internal padding for title/spacing */
+        }
+
+        .tabs-header {
+            display: flex;
+            background: rgba(0, 0, 0, 0.2);
+            overflow-x: auto;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .tab-btn {
+            padding: 1.2rem 1.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            color: var(--blue);
+            background: rgba(59, 130, 246, 0.1);
+            border-bottom-color: var(--blue);
+        }
+
+        .tab-content {
+            padding: 2.5rem 0 0 0;
+            /* Adjust padding due to viewer overlap */
+            display: none;
+        }
+
+        .tab-content.active {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 3rem;
+        }
+
+        .problem-icon-large {
+            width: 240px;
+            height: 240px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .problem-icon-large i,
+        .problem-icon-large svg {
+            width: 180px !important;
+            height: 180px !important;
+            filter: drop-shadow(0 0 25px currentColor);
+        }
+
+        /* Range Selector */
+        .range-selector select {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid var(--glass-border) !important;
+            color: #fff !important;
+            border-radius: 12px !important;
+            font-size: 0.8rem !important;
+            font-weight: 600 !important;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 0.4rem 2.5rem 0.4rem 1rem !important;
+        }
+
+        .range-selector select:hover {
+            border-color: var(--blue) !important;
+            background-color: rgba(59, 130, 246, 0.1) !important;
+        }
+
+        .range-selector select:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+        }
+
+        .dos-donts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .dos-donts>div {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            transition: transform 0.3s;
+        }
+
+        .dos-donts>div:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .dos-donts h4 {
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .list-item {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .list-item i.check {
+            color: #10b981;
+        }
+
+        .list-item i.cross {
+            color: #ef4444;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Trends Grid */
+        .trends-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .trend-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            min-height: 320px;
+        }
+
+        .trend-card-title {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--muted);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal {
+            background: #0f172a;
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 800px;
+            /* Widened to standard */
+            padding: 3rem;
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            display: flex;
+        }
+
+        .modal-overlay.open .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-close {
+            cursor: pointer;
+            color: var(--muted);
+            background: none;
+            border: none;
+        }
+
+        .modal-close:hover {
+            color: var(--text);
+        }
+
+        .toggle-row {
+            display: flex;
+            gap: 0.4rem;
+            margin-top: 0.2rem;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 0.6rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .toggle-btn.active {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .disease-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.4rem;
+            margin-top: 0.5rem;
+        }
+
+        .disease-box {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .disease-box.selected {
+            border-color: var(--purple);
+            border-style: dashed;
+            background: transparent;
+            /* Only dotted outline as requested */
+        }
+
+        .disease-box.readonly {
+            cursor: default;
+            opacity: 0.85;
+            pointer-events: none;
+        }
+
+        /* Icon stays subtle even if selected, per 'only dotted outline' request */
+        .disease-box.selected .chk-icon {
+            border-color: var(--purple);
+            opacity: 0.4;
+        }
+
+        .disease-label {
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        .disease-box.selected .disease-label {
+            color: var(--text);
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.7rem;
+            color: var(--text);
+            font-size: 0.9rem;
+            width: 100%;
+            margin-top: 0.3rem;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--blue);
+        }
+
+        /* --- RESPONSIVNESS FOR HEALTH SECTION --- */
+        @media (max-width: 850px) {
+            .tab-content.active {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                padding: 1.5rem;
+            }
+
+            .problem-icon-large {
+                width: 120px;
+                height: 120px;
+                margin: 0 auto;
+            }
+
+            .problem-icon-large i {
+                width: 50px !important;
+                height: 50px !important;
+            }
+
+            .dos-donts {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        @keyframes pulse-glow {
+            0% {
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            }
+
+            50% {
+                box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+            }
+
+            100% {
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        @keyframes rotate-slow {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .particle {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 5s infinite linear;
+        }
+
+        .pulse-high {
+            animation: pulse-glow 2s infinite ease-in-out;
+        }
+
+        .rotate-critical {
+            animation: rotate-slow 3s infinite linear;
+        }
+
+        /* General Hover Polish */
+        .card,
+        .stat-card,
+        .rec-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover,
+        .stat-card:hover,
+        .rec-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- FULL RESPONSIVENESS REFINED --- */
+        /* Span columns for bottom sections on desktop */
+        .health-grid,
+        .precautions-card,
+        #adviceMetricContainer,
+        .problems-viewer,
+        .trends-section,
+        .trends-grid {
+            grid-column: 1 / -1;
+            width: 100%;
+        }
+
+        /* Compact Health Recommendations as requested */
+        .health-grid .advice-card {
+            padding: 1.5rem 2rem !important;
+        }
+
+        .health-grid .rec-grid {
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 1400px) {
+            .page {
+                padding: 2rem;
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .page {
+                grid-template-columns: 320px 1fr;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .page {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .left-panel {
+                position: relative;
+                top: 0;
+                width: 100%;
+                max-width: 100%;
+                height: auto;
+                max-height: none;
+            }
+
+            .health-grid,
+            .precautions-card,
+            #adviceMetricContainer,
+            .problems-viewer,
+            .trends-section,
+            .trends-grid {
+                grid-column: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem;
+                height: auto;
+                flex-wrap: wrap;
+            }
+
+            .nav-links {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                margin-top: 1rem;
+                display: none;
+                /* Auto-hide for cleaner mobile UI */
+            }
+
+            .pollutants {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+
+            .trends-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-content.active {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 1.5rem;
+            }
+
+            .problem-icon-large {
+                width: 120px;
+                height: 120px;
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page {
+                padding: 1rem;
+            }
+
+            .pollutants {
+                grid-template-columns: 1fr !important;
+            }
+
+            .hero-aqi-val {
+                font-size: clamp(3rem, 15vw, 5rem);
+            }
+
+            .severity-hero-text {
+                font-size: 1rem;
+            }
+
+            .card,
+            .advice-card {
+                border-radius: 16px;
+                padding: 1.25rem !important;
+            }
+
+            .hero-present-label {
+                font-size: 0.7rem;
+            }
+
+            .hero-station-name {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Ultra small devices */
+        @media (max-width: 360px) {
+            nav {
+                padding: 1rem;
+                gap: 0.5rem;
+            }
+
+            .logo {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="atmosphere">
+        <div class="orb"
+            style="width: 500px; height: 500px; background: rgba(59, 130, 246, 0.1); top: -150px; right: -150px;"></div>
+        <div class="orb"
+            style="width: 400px; height: 400px; background: rgba(139, 92, 246, 0.08); bottom: -100px; left: 20%;"></div>
+    </div>
+
+    <nav>
+        <a href="/" style="text-decoration:none;" title="Climate Aware Respiratory Risk Forecasting System">
+            <div class="logo">
+                <img src="/static/logo.png" alt="CARRFS Logo" style="height: 84px; width: auto; border-radius: 6px;">
+                <span class="logo-text">CARRFS</span>
+            </div>
+        </a>
+        <div class="nav-links">
+            <a href="/dashboard" class="active"><i data-lucide="layout-dashboard" size="18"></i> Dashboard</a>
+            <a href="/map"><i data-lucide="route" size="18"></i> Route Optimizer</a>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <button class="profile-btn" onclick="openProfileModal()">
+                <i data-lucide="user" size="18"></i>
+                <span id="profileNameNav">Loading Profile...</span>
+            </button>
+            <button class="profile-btn" id="logoutBtn" style="display: none; padding: 0.6rem; aspect-ratio:1;"
+                onclick="window.location.href='/logout'" title="Logout">
+                <i data-lucide="log-out" size="18"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="page">
+        <!-- LEFT: Filters -->
+        <div class="left-panel" id="persistentPanel">
+            <div class="card">
+                <div class="card-title"><i data-lucide="map-pin" size="16"></i> Select Location</div>
+                <div class="field-label">State</div>
+                <select id="stateSelect">
+                    <option value="">Loading States...</option>
+                </select>
+
+                <div class="field-label">City</div>
+                <select id="citySelect">
+                    <option value="">-- Select City --</option>
+                </select>
+
+                <div class="field-label">Station</div>
+                <select id="stationSelect">
+                    <option value="">-- Select Station --</option>
+                </select>
+
+                <button class="predict-btn" id="predictBtn" onclick="predictAQI()">
+                    <i data-lucide="bar-chart-2" size="18"></i> Get Present AQI
+                </button>
+            </div>
+        </div>
+
+        <!-- RIGHT: Results -->
+        <div class="right-panel">
+            <!-- Premium Initial Placeholder -->
+            <div class="hero-placeholder" id="placeholder"
+                style="position:relative; display:flex; flex-direction:column; align-items:center; text-align:center;">
+
+                <!-- Top Side: Text Content -->
+                <div id="placeholderContent" style="width: 100%; max-width: 600px; margin: 0 auto;">
+                    <i data-lucide="cloud-sun" size="64" stroke-width="1.5"
+                        style="margin-bottom:1rem; display:inline-block;"></i>
+                    <h2>Ready to Explore Your Air Quality?</h2>
+                    <p style="margin:0 auto 1rem auto;">Select a location from the panel on the left to view
+                        high-fidelity insights, health projections, and environmental trends for your city.</p>
+                    <div
+                        style="padding: 0.5rem 1.5rem; background: rgba(59, 130, 246, 0.1); border-radius: 20px; font-size: 0.8rem; color: var(--blue); display: inline-flex; align-items: center; gap: 5px; margin-bottom: 2rem;">
+                        <i data-lucide="map-pin" size="14"></i> All data is fetched live from official sources
+                    </div>
+                </div>
+
+                <!-- Bottom Side: New Center-Aligned Turbine Animation -->
+                <div class="loading" id="loadingDiv">
+                    <div class="turbine-container">
+                        <div class="air-flow-ring"></div>
+                        <div class="air-flow-ring"></div>
+                        <div class="turbine-core"></div>
+                    </div>
+                    <p
+                        style="color: var(--blue); font-weight: 600; letter-spacing: 1px; font-size: 0.95rem; margin-top: 0.5rem;">
+                        Analyzing Atmospheric Data…</p>
+                </div>
+            </div>
+
+            <!-- Hero Overhaul Refinement -->
+            <div class="hero-banner" id="heroBanner" style="display:none;">
+                <div id="particleContainer"
+                    style="position:absolute; inset:0; overflow:hidden; border-radius:30px; z-index:0;"></div>
+                <div class="monuments-bg"></div>
+                <div class="silhouette"></div>
+
+                <div class="hero-top-row">
+                    <div class="hero-top-right" style="margin-left: auto;">
+                        <div id="heroSeason" class="hero-season-text">Loading...</div>
+                        <div id="heroDate" class="hero-time-text"
+                            style="font-size: 0.75rem; opacity: 0.7; margin-bottom: 2px;">-- --- ----</div>
+                        <div id="heroTime" class="hero-time-text">--:-- --</div>
+                    </div>
+                </div>
+
+                <div class="hero-main-row" style="margin-top: 0;">
+                    <div class="hero-left-section">
+                        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                            <div class="hero-present-label">Present AQI</div>
+                            <div class="hero-station-name" id="heroStationName">Select a Station</div>
+                            <div class="aqi-hero-val" id="heroAQI">0</div>
+                        </div>
+                    </div>
+                    <div class="hero-right-section" style="justify-content: center; height: 100%;">
+                        <div class="severity-hero-box">
+                            <div class="severity-hero-label">AIR QUALITY IS</div>
+                            <div class="severity-hero-text" id="heroSeverity">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-bottom-row">
+                    <div class="range-bar-container">
+                        <div class="range-track-premium">
+                            <div class="range-marker-premium" id="rangeMarker"></div>
+                        </div>
+                        <div class="range-labels-premium">
+                            <span>Good</span>
+                            <span>Satisfactory</span>
+                            <span>Moderate</span>
+                            <span>Poor</span>
+                            <span>Very Poor</span>
+                            <span>Severe</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Stats Grid -->
+            <div class="pollutants" id="pollutantsGrid"
+                style="display:none; grid-template-columns: repeat(4, 1fr); gap:1rem; margin-bottom: 2rem;">
+                <div class="stat-card pm25">
+                    <div class="stat-icon" style="color:#3b82f6"><i data-lucide="waves"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-label">PM2.5</div>
+                        <div class="stat-value" id="cPM25">—</div>
+                        <div class="stat-unit">µg/m³</div>
+                    </div>
+                </div>
+                <div class="stat-card pm10">
+                    <div class="stat-icon" style="color:#6366f1"><i data-lucide="cloud"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-label">PM10</div>
+                        <div class="stat-value" id="cPM10">—</div>
+                        <div class="stat-unit">µg/m³</div>
+                    </div>
+                </div>
+                <div class="stat-card temp">
+                    <div class="stat-icon" style="color:#f97316"><i data-lucide="thermometer"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-label">Temperature</div>
+                        <div class="stat-value" id="cTemp">—</div>
+                        <div class="stat-unit">°C</div>
+                    </div>
+                </div>
+                <div class="stat-card hum">
+                    <div class="stat-icon" style="color:#06b6d4"><i data-lucide="droplets"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-label">Humidity</div>
+                        <div class="stat-value" id="cHum">—</div>
+                        <div class="stat-unit">%</div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- End of .right-panel -->
+
+        <!-- Bottom Sections (Full Width) -->
+        <div class="health-grid" id="healthGrid" style="display:none; margin-top:2rem;">
+            <div class="advice-card">
+                <div class="trends-header"
+                    style="margin-bottom: 0.5rem; padding: 0; display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="shield-check" style="color:#7c3aed"></i>
+                    <span class="trends-title">Health Recommendations</span>
+                </div>
+                <div style="font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem;">
+                    General Health Recommendations based on Current Measures
+                </div>
+
+                <div class="rec-grid">
+                    <div class="rec-item">
+                        <i data-lucide="fan" size="24"></i>
+                        <div class="rec-name">Air Purifier</div>
+                        <div class="rec-status" id="recPurifier">Check</div>
+                    </div>
+                    <div class="rec-item">
+                        <i data-lucide="car" size="24"></i>
+                        <div class="rec-name">Car Filter</div>
+                        <div class="rec-status" id="recCar">Check</div>
+                    </div>
+                    <div class="rec-item">
+                        <i data-lucide="shield" size="24"></i>
+                        <div class="rec-name">N95 Mask</div>
+                        <div class="rec-status" id="recMask">Check</div>
+                    </div>
+                    <div class="rec-item">
+                        <i data-lucide="home" size="24"></i>
+                        <div class="rec-name">Stay Indoor</div>
+                        <div class="rec-status" id="recIndoor">Check</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="health-grid" id="precautionsCard" style="display:none; margin-top:2rem;">
+            <div class="advice-card">
+                <div class="trends-header"
+                    style="margin-bottom: 1.5rem; padding: 0; display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="shield" style="color:#7c3aed"></i>
+                    <span class="trends-title">PRECAUTIONS</span>
+                </div>
+                <div class="prec-list" id="precList"></div>
+            </div>
+        </div>
+
+        <div id="adviceMetricContainer" class="advice-card" style="display:none; margin-top: 2rem;">
+            <div class="trends-header"
+                style="margin-bottom: 0.5rem; padding: 0; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="flame" style="color:#fca311"></i>
+                    <span class="trends-title">Health Advice</span>
+                </div>
+                <div class="cigs-meta-top">
+                    <span>WEEKLY <b id="cigWeekly">0.0</b></span>
+                    <span style="margin-left: 1.5rem;">MONTHLY <b id="cigMonthly">0.0</b></span>
+                </div>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem;">
+                Visualizing respiratory risk through the cigarette equivalent metric.
+            </p>
+            <div class="cigarette-box">
+                <div class="cigs-val" id="cigDaily">0.0</div>
+                <div class="cigs-label">
+                    <b>CIGARETTES</b><br>PER DAY
+                </div>
+                <div style="margin-left: auto;">
+                    <svg width="54" height="54" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                        style="filter: drop-shadow(0 0 10px rgba(252, 163, 17, 0.3));">
+                        <path d="M2 14h14a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H2v4z" fill="#f8fafc" />
+                        <path d="M17 10h4a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-4v-4z" fill="#fca311" />
+                        <path d="M12 7c0-1.5 1.5-2.5 1.5-4" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"
+                            opacity="0.6" />
+                        <path d="M16 7c0-1.5 1.5-2.5 1.5-4" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"
+                            opacity="0.6" />
+                        <path d="M17 10v4" stroke="#000" stroke-width="0.5" opacity="0.2" />
+                    </svg>
+                </div>
+            </div>
+            <div id="cigSuggestion" class="cig-suggestion" style="display:none;">
+                <i data-lucide="info" size="18" style="flex-shrink:0;"></i>
+                <span id="cigSuggestionText"></span>
+            </div>
+        </div>
+
+        <div class="problems-viewer" id="problemsViewer" style="display:none; margin-top:3rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem;">
+                <div style="width: 4px; height: 24px; background: #3b82f6; border-radius: 4px;"></div>
+                <h2 style="font-size: 1.5rem; font-weight: 700; color: #f8fafc; letter-spacing: -0.02em; margin: 0;">
+                    Health Impact Analysis</h2>
+            </div>
+            <div class="tabs-header" id="problemTabs" style="border-radius: 12px; margin-bottom: 1.5rem;">
+                <div class="tab-btn active" onclick="switchProblemTab('headache')">Headaches</div>
+                <div class="tab-btn" onclick="switchProblemTab('eye')">Eye Irritation</div>
+                <div class="tab-btn" onclick="switchProblemTab('asthma')">Asthma</div>
+                <div class="tab-btn" onclick="switchProblemTab('heart')">Heart Issues</div>
+                <div class="tab-btn" onclick="switchProblemTab('allergy')">Allergies</div>
+                <div class="tab-btn" onclick="switchProblemTab('pregnancy')">Pregnancy</div>
+                <div class="tab-btn" onclick="switchProblemTab('sinus')">Sinus</div>
+                <div class="tab-btn" onclick="switchProblemTab('cold')">Cold/Flu</div>
+                <div class="tab-btn" onclick="switchProblemTab('copd')">COPD</div>
+            </div>
+            <div id="problemContent" class="tab-content active"></div>
+        </div>
+
+        <div class="trends-section" id="trendsSection" style="display:none; margin-top:2.5rem;">
+            <div class="trends-header"
+                style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="bar-chart-3" style="color:#3b82f6"></i>
+                    <span class="trends-title">Historical AQI Insights</span>
+                </div>
+                <div class="range-selector">
+                    <select id="trendRange" onchange="changeTrendRange()" class="form-input"
+                        style="padding: 0.4rem 2rem 0.4rem 1rem; width: auto; background-image: none;">
+                        <option value="12h">Last 12 Hours</option>
+                        <option value="24h" selected>Last 24 Hours</option>
+                        <option value="7d">Last 7 Days</option>
+                        <option value="30d">Last 30 Days</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="trend-card">
+                <div class="trend-card-title" id="mainTrendTitle">
+                    <i data-lucide="clock" size="14"></i> TREND ANALYSIS (24H)
+                </div>
+                <div id="mainTrendChart"></div>
+            </div>
+
+            <div class="trend-card" style="margin-top:2rem;">
+                <div class="trend-card-title"><i data-lucide="arrow-left-right" size="14"></i> STATION COMPARISON</div>
+                <div id="compChart"></div>
+            </div>
+        </div>
+    </div> <!-- End of .page -->
+
+    <!-- PROFILE MODAL -->
+    <div class="modal-overlay" id="profileModal" onclick="if(event.target===this) closeProfileModal()">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title"><i data-lucide="user"></i> Your Health Profile</h2>
+                <button class="modal-close" id="modalCloseBtn" onclick="closeProfileModal()"><i
+                        data-lucide="x"></i></button>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
+                <div><label class="field-label">Full Name</label><input type="text" id="p_name" class="form-input"
+                        placeholder="Rahul Sharma" autocomplete="off"></div>
+                <div><label class="field-label">Age</label><input type="number" id="p_age" class="form-input"
+                        placeholder="28" autocomplete="off"></div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+                <div>
+                    <label class="field-label">Gender</label>
+                    <div class="toggle-row" id="genderGroup">
+                        <button class="toggle-btn" onclick="selectToggle('genderGroup',this,'Male')">Male</button>
+                        <button class="toggle-btn" onclick="selectToggle('genderGroup',this,'Female')">Female</button>
+                        <button class="toggle-btn" onclick="selectToggle('genderGroup',this,'Other')">Other</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="field-label">Smoker</label>
+                    <div class="toggle-row" id="smokerGroup">
+                        <button class="toggle-btn" onclick="selectToggle('smokerGroup',this,'Yes')">Yes</button>
+                        <button class="toggle-btn" onclick="selectToggle('smokerGroup',this,'No')">No</button>
+                    </div>
+                </div>
+            </div>
+
+            <label class="field-label" style="margin-top:1.5rem;">Pre-existing Conditions</label>
+            <div class="disease-grid" id="diseaseGrid"></div>
+
+            <button class="predict-btn" style="margin-top:2rem;" onclick="saveProfile()">
+                <i data-lucide="save" size="18"></i> Save Profile
+            </button>
+        </div>
+    </div>
+
+    <!-- Inject profile_complete boolean from Flask -->
+    <meta id="metaProfileComplete" data-complete="{{ 'true' if profile_complete else 'false' }}">
+    <script>
+        const IS_PROFILE_COMPLETE = document.getElementById('metaProfileComplete').dataset.complete === 'true';
+
+        const PROBLEM_DATA = {
+            headache: {
+                title: "Headaches", icon: "brain", color: "#60a5fa",
+                ranges: [
+                    { min: 0, max: 100, risk: "Low", dos: ["Maintain hydration", "Keep indoor ventilation"], donts: ["Long exposure to hot or poorly ventilated areas"] },
+                    { min: 101, max: 200, risk: "Moderate", dos: ["Limit prolonged outdoor exposure", "Drink water frequently"], donts: ["Intense outdoor physical activity"] },
+                    { min: 201, max: 300, risk: "High", dos: ["Stay indoors during peak pollution hours", "Use air purifiers"], donts: ["Outdoor exercise", "Exposure to traffic-heavy areas"] },
+                    { min: 301, max: 500, risk: "Very High", dos: ["Remain indoors", "Use air filtration systems"], donts: ["Any outdoor exposure or strenuous activity"] }
+                ]
+            },
+            eye: {
+                title: "Eye Irritation", icon: "eye", color: "#38bdf8",
+                ranges: [
+                    { min: 0, max: 100, risk: "Low", dos: ["Maintain normal hygiene and eye care"], donts: ["Direct exposure to dust or smoke"] },
+                    { min: 101, max: 200, risk: "Moderate", dos: ["Wear protective glasses outdoors"], donts: ["Rubbing eyes after outdoor exposure"] },
+                    { min: 201, max: 300, risk: "High", dos: ["Wash eyes with clean water after outdoor exposure"], donts: ["Long outdoor exposure in polluted areas"] },
+                    { min: 301, max: 500, risk: "Very High", dos: ["Stay indoors with filtered air"], donts: ["Outdoor activities in polluted environments"] }
+                ]
+            },
+            asthma: {
+                title: "Asthma", icon: "stethoscope", color: "#10b981",
+                ranges: [
+                    { min: 0, max: 100, risk: "Low", dos: ["Maintain normal activity levels"], donts: ["Ignore early respiratory symptoms"] },
+                    { min: 101, max: 200, risk: "Moderate", dos: ["Carry inhaler and limit outdoor exposure"], donts: ["Intense outdoor activities"] },
+                    { min: 201, max: 300, risk: "High", dos: ["Stay indoors during high pollution periods"], donts: ["Outdoor exercise or exposure to smoke"] },
+                    { min: 301, max: 500, risk: "Very High", dos: ["Remain indoors and use HEPA air purifiers"], donts: ["Any outdoor exposure"] }
+                ]
+            },
+            heart: {
+                title: "Heart Issues", icon: "heart-pulse", color: "#ef4444",
+                ranges: [
+                    { min: 0, max: 100, risk: "Low", dos: ["Maintain moderate activity levels"], donts: ["Ignore unusual fatigue"] },
+                    { min: 101, max: 200, risk: "Moderate", dos: ["Reduce prolonged outdoor exposure"], donts: ["Heavy physical exertion outdoors"] },
+                    { min: 201, max: 300, risk: "High", dos: ["Stay in well-ventilated indoor environments"], donts: ["Long exposure to traffic pollution"] },
+                    { min: 301, max: 500, risk: "Very High", dos: ["Avoid outdoor activity and monitor health closely"], donts: ["Any strenuous activity outdoors"] }
+                ]
+            },
+            allergy: {
+                title: "Allergies", icon: "flower-2", color: "#f59e0b",
+                ranges: [
+                    { min: 0, max: 100, risk: "Low", dos: ["Maintain regular hygiene"], donts: ["Exposure to dust accumulation"] },
+                    { min: 101, max: 200, risk: "Moderate", dos: ["Use masks if sensitive to allergens"], donts: ["Stay in dusty environments"] },
+                    { min: 201, max: 300, risk: "High", dos: ["Keep windows closed and use air filtration"], donts: ["Outdoor exposure in polluted zones"] },
+                    { min: 301, max: 500, risk: "Very High", dos: ["Stay indoors and maintain indoor air purification"], donts: ["Exposure to polluted air outdoors"] }
+                ]
+            },
+            pregnancy: {
+                title: "Pregnancy", icon: "baby", color: "#ec4899",
+                ranges: [
+                    { min: 0, max: 100, risk: "Low", dos: ["Maintain normal outdoor activities"], donts: ["Exposure to extreme environmental conditions"] },
+                    { min: 101, max: 200, risk: "Moderate", dos: ["Limit prolonged outdoor exposure"], donts: ["Stay long in polluted areas"] },
+                    { min: 201, max: 300, risk: "High", dos: ["Prefer indoor environments during high pollution hours"], donts: ["Outdoor physical exertion"] },
+                    { min: 301, max: 500, risk: "Very High", dos: ["Remain indoors and ensure clean air environment"], donts: ["Exposure to outdoor pollution"] }
+                ]
+            },
+            sinus: {
+                title: "Sinus", icon: "thermometer-snowflake", color: "#a5b4fc",
+                ranges: [
+                    { min: 0, max: 100, risk: "Low", dos: ["Maintain proper hydration"], donts: ["Exposure to extreme temperature changes"] },
+                    { min: 101, max: 200, risk: "Moderate", dos: ["Use humidifiers to maintain indoor air quality"], donts: ["Long outdoor exposure"] },
+                    { min: 201, max: 300, risk: "High", dos: ["Use nasal sprays or humidified air if needed"], donts: ["Exposure to polluted outdoor air"] },
+                    { min: 301, max: 500, risk: "Very High", dos: ["Stay indoors and maintain clean air environment"], donts: ["Outdoor exposure"] }
+                ]
+            },
+            cold: {
+                title: "Cold / Flu", icon: "thermometer", color: "#fbbf24",
+                ranges: [
+                    { min: 0, max: 100, risk: "Low", dos: ["Maintain hydration and ventilation"], donts: ["Exposure to sudden temperature changes"] },
+                    { min: 101, max: 200, risk: "Moderate", dos: ["Wear masks during outdoor exposure"], donts: ["Long outdoor exposure"] },
+                    { min: 201, max: 300, risk: "High", dos: ["Stay indoors and rest when symptoms appear"], donts: ["Physical exertion outdoors"] },
+                    { min: 301, max: 500, risk: "Very High", dos: ["Remain indoors with filtered air"], donts: ["Exposure to polluted air"] }
+                ]
+            },
+            copd: {
+                title: "COPD", icon: "lungs", color: "#2dd4bf",
+                ranges: [
+                    { min: 0, max: 100, risk: "Low", dos: ["Maintain normal daily activities"], donts: ["Ignore mild breathing discomfort"] },
+                    { min: 101, max: 200, risk: "Moderate", dos: ["Reduce outdoor exposure"], donts: ["Exposure to smoke or pollution"] },
+                    { min: 201, max: 300, risk: "High", dos: ["Stay indoors and use air purifiers"], donts: ["Outdoor activities"] },
+                    { min: 301, max: 500, risk: "Very High", dos: ["Remain indoors with filtered air and follow medical advice"], donts: ["Any outdoor exposure"] }
+                ]
+            }
+        };
+    </script>
+
+    <script>
+        // Breathing animation handles itself via CSS, but we can add particles if needed
+        function startDataAnimation() {
+            // Re-using particle logic for atmospheric feel
+            const container = document.getElementById('loadingDiv');
+            if (!container) return;
+
+            // Clean up any old particles
+            const oldP = container.querySelectorAll('.atm-particle');
+            oldP.forEach(p => p.remove());
+
+            for (let i = 0; i < 15; i++) {
+                const p = document.createElement('div');
+                p.className = 'atm-particle';
+                p.style.cssText = `
+                    position: absolute;
+                    width: 4px;
+                    height: 4px;
+                    background: #3b82f6;
+                    border-radius: 50%;
+                    opacity: 0.4;
+                    pointer-events: none;
+                `;
+                container.appendChild(p);
+
+                if (typeof gsap !== 'undefined') {
+                    gsap.set(p, { x: 0, y: 0 });
+                    gsap.to(p, {
+                        x: (Math.random() - 0.5) * 200,
+                        y: (Math.random() - 0.5) * 200,
+                        opacity: 0,
+                        duration: 2 + Math.random() * 2,
+                        repeat: -1,
+                        ease: "power1.out",
+                        delay: Math.random() * 2
+                    });
+                }
+            }
+        }
+
+        function stopDataAnimation() {
+            const container = document.getElementById('loadingDiv');
+            if (container) {
+                const particles = container.querySelectorAll('.atm-particle');
+                particles.forEach(p => p.remove());
+            }
+            if (typeof gsap !== 'undefined') {
+                gsap.killTweensOf('.atm-particle');
+            }
+        }
+
+        lucide.createIcons();
+        AOS.init({ duration: 1000, once: true, easing: 'ease-out-expo' });
+
+        // Smooth Entry for dashboard elements directly
+        gsap.from(".main-content .card", { opacity: 0, y: 40, duration: 1.2, stagger: 0.1, ease: "power4.out", delay: 0.2 });
+        gsap.from("nav", { opacity: 0, y: -20, duration: 1, ease: "expo.out" });
+
+        let hierarchy = {}, latestData = {};
+        let choicesState, choicesCity, choicesStation;
+
+        async function init() {
+            window.scrollTo(0, 0);
+            // Setup Choices.js
+            choicesState = new Choices('#stateSelect', { searchEnabled: true, itemSelectText: '', placeholder: true });
+            choicesCity = new Choices('#citySelect', { searchEnabled: true, itemSelectText: '', placeholder: true });
+            choicesStation = new Choices('#stationSelect', { searchEnabled: true, itemSelectText: '', placeholder: true });
+            new Choices('#trendRange', { searchEnabled: false, itemSelectText: '', placeholder: true });
+
+            document.getElementById('stateSelect').addEventListener('change', onStateChange);
+            document.getElementById('citySelect').addEventListener('change', onCityChange);
+
+            // Fetch Data
+            try {
+                const [prof, data] = await Promise.all([
+                    fetch('/get-profile').then(r => r.ok ? r.json() : {}),
+                    fetch('/stations').then(r => r.json())
+                ]);
+
+                // Populate Name
+                document.getElementById('profileNameNav').textContent = prof.name || 'Set Profile';
+                if (prof.name) document.getElementById('logoutBtn').style.display = 'flex';
+                window.userProfileCache = prof;
+
+                // Populate Profile fields if they exist
+                if (prof.name) {
+                    document.getElementById('p_name').value = prof.name;
+                    document.getElementById('p_age').value = (prof.age && prof.age !== '—') ? prof.age : '';
+
+                    // Build grid AFTER setting age so auto-selection works
+                    buildDiseaseGrid();
+
+                    if (prof.gender) {
+                        const genderBtn = [...document.querySelectorAll('#genderGroup button')].find(b =>
+                            b.textContent.includes(prof.gender));
+                        if (genderBtn) selectToggle('genderGroup', genderBtn, prof.gender);
+                    }
+                    if (prof.smoker) {
+                        const smokerBtn = [...document.querySelectorAll('#smokerGroup button')].find(b => b.onclick &&
+                            b.onclick.toString().includes(prof.smoker));
+                        if (smokerBtn) selectToggle('smokerGroup', smokerBtn, prof.smoker);
+                    }
+                    if (prof.conditions) prof.conditions.forEach(c => {
+                        // SKIP Elderly and Children! Age check already handled them in buildDiseaseGrid
+                        if (c === 'Elderly' || c === 'Children') return;
+                        const box = [...document.querySelectorAll('.disease-box')].find(b => b.dataset.val === c);
+                        if (box) box.classList.add('selected');
+                    });
+                } else {
+                    buildDiseaseGrid();
+                }
+
+                if (!IS_PROFILE_COMPLETE) openProfileModal();
+
+                // Populate Stations
+                hierarchy = data.hierarchy;
+                latestData = data.latest;
+                const states = Object.keys(hierarchy).sort().map(s => ({ value: s, label: s }));
+                choicesState.setChoices(states, 'value', 'label', true);
+            } catch (err) { console.error(err); }
+        }
+
+        function onStateChange() {
+            const state = document.getElementById('stateSelect').value;
+            // Complete reset of dependent dropdowns
+            choicesCity.removeActiveItems();
+            choicesCity.setChoices([], 'value', 'label', true);
+            choicesStation.removeActiveItems();
+            choicesStation.setChoices([], 'value', 'label', true);
+
+            if (!state) return;
+            const cities = Object.keys(hierarchy[state] || {}).sort().map(c => ({ value: c, label: c }));
+            choicesCity.setChoices(cities, 'value', 'label', true);
+        }
+
+        function onCityChange() {
+            const state = document.getElementById('stateSelect').value;
+            const city = document.getElementById('citySelect').value;
+            choicesStation.removeActiveItems();
+            choicesStation.setChoices([], 'value', 'label', true);
+
+            if (!city) return;
+            const stations = (hierarchy[state]?.[city] || []).sort().map(s => ({ value: s, label: s }));
+            choicesStation.setChoices(stations, 'value', 'label', true);
+        }
+
+        async function predictAQI() {
+            const station = document.getElementById('stationSelect').value;
+            if (!station) {
+                Swal.fire({ title: 'Error', text: 'Please select a station first.', icon: 'error', background: '#1e293b', color: '#fff' });
+                return;
+            }
+
+            // Re-show placeholder and loadingDiv for every prediction (ensures caption visibility)
+            document.getElementById('placeholder').style.display = 'flex';
+            document.getElementById('loadingDiv').style.display = 'flex';
+            startDataAnimation();
+
+            ['heroBanner', 'pollutantsGrid', 'healthGrid', 'trendsSection', 'problemsViewer', 'precautionsCard',
+                'adviceMetricContainer'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = 'none';
+                });
+
+            // Clear previous charts to prevent stale data flicker
+            if (mainChart) { mainChart.destroy(); mainChart = null; }
+            if (cChart) { cChart.destroy(); cChart = null; }
+
+            try {
+                const res = await fetch('/predict-station', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ station })
+                });
+                const data = await res.json();
+                if (data.error) throw new Error(data.error);
+                renderResults(data);
+                fetchTrends(station);
+            } catch (e) {
+                Swal.fire({ title: 'Failed', text: e.message, icon: 'error', background: '#1e293b', color: '#fff' });
+            } finally {
+                document.getElementById('loadingDiv').style.display = 'none';
+                stopDataAnimation();
+            }
+        }
+
+        let currentAQI = 0;
+
+        function renderResults(d) {
+            currentAQI = d.aqi;
+            // Hide placeholder only when data is ready
+            document.getElementById('placeholder').style.display = 'none';
+            document.getElementById('heroBanner').style.display = 'flex';
+            document.getElementById('heroAQI').textContent = d.aqi;
+            document.getElementById('heroSeverity').textContent = d.severity;
+            document.getElementById('heroStationName').textContent = d.station;
+
+            // Update Background and Monuments
+            updateHeroStyle(d.aqi, d.color);
+
+            // Detailed Pollutants
+            document.getElementById('cPM25').textContent = d.pm25;
+            document.getElementById('cPM10').textContent = d.pm10;
+            document.getElementById('cTemp').textContent = d.temp;
+            document.getElementById('cHum').textContent = d.humidity;
+            document.getElementById('pollutantsGrid').style.display = 'grid';
+
+            // Range Marker Logic (Piecewise for Accuracy)
+            const marker = document.getElementById('rangeMarker');
+            marker.style.left = getAQIPercentage(d.aqi) + '%';
+
+            // Initial Time Update
+            updateClock();
+
+            // Health Recommendations & Advice
+            updateRecommendations(d.aqi);
+            document.getElementById('healthGrid').style.display = 'flex';
+
+            // Initialize Particles based on AQI
+            initParticles(d.aqi, d.color);
+            if (d.cigs) {
+                document.getElementById('cigDaily').textContent = d.cigs.daily;
+                document.getElementById('cigWeekly').textContent = d.cigs.weekly;
+                document.getElementById('cigMonthly').textContent = d.cigs.monthly;
+                document.getElementById('adviceMetricContainer').style.display = 'flex';
+
+                // Dynamic Health Suggestion
+                const sugEl = document.getElementById('cigSuggestion');
+                const sugText = document.getElementById('cigSuggestionText');
+                const daily = d.cigs.daily;
+
+                if (daily > 5.0) {
+                    sugText.textContent = "CRITICAL WARNING: Breathing this air for 24 hours is like smoking a quarter-pack of cigarettes. N95 masks and air purifiers are mandatory now.";
+                    sugEl.style.display = 'flex';
+                    sugEl.style.background = 'rgba(239, 68, 68, 0.1)';
+                    sugEl.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+                } else if (daily > 2.0) {
+                    sugText.textContent = "HIGH RISK: Air pollution intake mimics daily cigarette smoking. Limit outdoor activity and run air purifiers on high to protect your lungs.";
+                    sugEl.style.display = 'flex';
+                    sugEl.style.background = 'rgba(245, 158, 11, 0.1)';
+                    sugEl.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+                } else if (daily > 0.5) {
+                    sugText.textContent = "MODERATE IMPACT: These AQI levels are equivalent to regular low-level smoking. Use masks if you have asthma or heart conditions.";
+                    sugEl.style.display = 'flex';
+                } else {
+                    sugText.textContent = "LOW EXPOSURE: Air quality is mostly safe. Sensitive individuals should still watch for mild throat irritation or coughing.";
+                    sugEl.style.display = 'flex';
+                }
+                lucide.createIcons({ root: sugEl });
+            }
+
+            // Trends
+            document.getElementById('trendsSection').style.display = 'block';
+
+            // Risk Viewer
+            document.getElementById('problemsViewer').style.display = 'block';
+            switchProblemTab('headache'); // Default tab
+
+            // Legacy Precautions List (at the bottom)
+            const list = document.getElementById('precList'); list.innerHTML = '';
+            if (d.precautions && d.precautions.length) {
+                d.precautions.forEach((p) => {
+                    list.innerHTML += `<div class="prec-item"><span class="prec-bullet">›</span>
+            <div style="flex:1">${p}</div>
+        </div>`;
+                });
+                document.getElementById('precautionsCard').style.display = 'block';
+            }
+
+            lucide.createIcons();
+        }
+
+        function getAQIPercentage(aqi) {
+            if (aqi <= 50) return (aqi / 50) * 16.66;
+            if (aqi <= 100) return 16.66 + ((aqi - 50) / 50) * 16.66;
+            if (aqi <= 200) return 33.33 + ((aqi - 100) / 100) * 16.66;
+            if (aqi <= 300) return 50.00 + ((aqi - 200) / 100) * 16.66;
+            if (aqi <= 400) return 66.66 + ((aqi - 300) / 100) * 16.66;
+            if (aqi <= 500) return 83.33 + ((aqi - 400) / 100) * 16.66;
+            return 100;
+        }
+
+        function updateHeroStyle(aqi, color) {
+            const hero = document.getElementById('heroBanner');
+            // Background is a vibrant gradient reflecting the severity color aggressively
+            hero.style.background = `linear-gradient(135deg, ${color}e6, #0f172a)`;
+            hero.style.borderColor = `${color}aa`;
+
+            // Marker glow matches severity
+            const marker = document.getElementById('rangeMarker');
+            marker.style.boxShadow = `0 0 25px ${color}, 0 0 50px ${color}88`;
+            marker.style.backgroundColor = '#fff';
+
+            // Glow for text based on severity
+            const sevText = document.getElementById('heroSeverity');
+            sevText.style.textShadow = `0 0 15px ${color}`;
+            sevText.style.color = '#fff';
+        }
+
+        function updateRecommendations(aqi) {
+            const config = {
+                purifier: { status: 'Not Required', color: 'var(--muted)' },
+                car: { status: 'Not Needed', color: 'var(--muted)' },
+                mask: { status: 'Not Needed', color: 'var(--muted)' },
+                indoor: { status: 'Safe Outdoor Activities', color: 'var(--muted)' }
+            };
+
+            if (aqi > 300) { // 301 - 500
+                config.purifier = { status: 'Critical', color: '#ef4444' };
+                config.car = { status: 'Must Use', color: '#ef4444' };
+                config.mask = { status: 'Mandatory', color: '#ef4444' };
+                config.indoor = { status: 'Stay Indoors', color: '#ef4444' };
+            } else if (aqi > 200) { // 201 - 300
+                config.purifier = { status: 'Recommended', color: '#f59e0b' };
+                config.car = { status: 'Cabin Filter Recommended', color: '#f59e0b' };
+                config.mask = { status: 'Recommended', color: '#f59e0b' };
+                config.indoor = { status: 'Reduce Outdoor Exposure', color: '#f59e0b' };
+            } else if (aqi > 100) { // 101 - 200
+                config.purifier = { status: 'Optional', color: '#eab308' };
+                config.car = { status: 'Use Recirculation Mode', color: '#eab308' };
+                config.mask = { status: 'Optional', color: '#eab308' };
+                config.indoor = { status: 'Limit Heavy Activities', color: '#eab308' };
+            }
+
+            const items = {
+                'recPurifier': config.purifier,
+                'recCar': config.car,
+                'recMask': config.mask,
+                'recIndoor': config.indoor
+            };
+
+            for (const [id, val] of Object.entries(items)) {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.textContent = val.status;
+                    el.style.color = val.color;
+
+                    const card = el.closest('.rec-item');
+                    if (card) {
+                        // Reset animations for fresh look
+                        card.classList.remove('pulse-high', 'pulse-warning', 'pulse-safe', 'pulse-warning');
+                        const icon = card.querySelector('i');
+                        if (icon) icon.classList.remove('rotate-critical');
+
+                        // Apply new effects based on risk
+                        if (aqi > 300) {
+                            card.classList.add('pulse-high');
+                            if (id === 'recPurifier' && icon) icon.classList.add('rotate-critical');
+                        } else if (aqi > 100) {
+                            card.classList.add('pulse-warning');
+                        } else {
+                            card.classList.add('pulse-safe');
+                        }
+                    }
+                }
+            }
+        }
+
+        function initParticles(aqi, color) {
+            const container = document.getElementById('particleContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            let count = 0;
+            if (aqi > 400) count = 40; // Severe
+            else if (aqi > 300) count = 25; // Very Poor
+            else if (aqi > 200) count = 12; // Poor
+            else if (aqi > 100) count = 4; // Moderate
+
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                const size = Math.random() * 5 + 2;
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.top = (Math.random() * 50 + 100) + '%';
+                p.style.background = color;
+                p.style.opacity = Math.random() * 0.4 + 0.1;
+                p.style.animationDelay = Math.random() * 5 + 's';
+                p.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                container.appendChild(p);
+            }
+        }
+
+        function switchProblemTab(type) {
+            const data = PROBLEM_DATA[type];
+            if (!data) return;
+
+            // Find current range advice
+            const rangeInfo = data.ranges.find(r => currentAQI >= r.min && currentAQI <= r.max) || data.ranges[data.ranges.length - 1];
+
+            // Update Tabs UI
+            document.querySelectorAll('#problemTabs .tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase().includes(data.title.toLowerCase().split(' ')[0])) {
+                    btn.classList.add('active');
+                }
+            });
+
+            const content = document.getElementById('problemContent');
+            let iconHtml = '';
+
+            // Hardcode high-fidelity lung SVG for COPD as pure Lucide often fails to bundle it
+            if (data.icon === 'lungs') {
+                iconHtml = `
+                <svg width="180" height="180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 25px ${data.color});">
+                    <path d="M12 2v5" />
+                    <path d="M12 7c-2-1-4-1-6 1S3 12 3 17c0 3 2 4 4 4s4-2 5-6" />
+                    <path d="M12 7c2-1 4-1 6 1s3 4 3 9c0 3-2 4-4 4s-4-2-5-6" />
+                    <circle cx="8" cy="14" r="1.5" fill="currentColor" />
+                    <circle cx="16" cy="14" r="1.5" fill="currentColor" />
+                    <circle cx="6" cy="18" r="1" fill="currentColor" />
+                    <circle cx="18" cy="18" r="1" fill="currentColor" />
+                </svg>
+                `;
+            } else {
+                iconHtml = `<i data-lucide="${data.icon}" size="180"></i>`;
+            }
+
+            content.innerHTML = `
+                <div class="problem-icon-large" style="color: ${data.color}">
+                    ${iconHtml}
+                </div>
+                <div>
+                    <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">${data.title}</h3>
+                    <p style="color: var(--muted); margin-bottom: 2rem;">
+                        Risk level is <b style="color:#ef4444">${rangeInfo.risk}</b> based on current air quality.
+                    </p>
+
+                    <div class="dos-donts">
+                        <div>
+                            <h4 style="color:#10b981"><i data-lucide="check-circle-2" size="14"></i> Do's</h4>
+                            ${rangeInfo.dos.map(item => `
+                            <div class="list-item">
+                                <i data-lucide="check-circle" class="check" size="16"></i>
+                                <span>${item}</span>
+                            </div>
+                            `).join('')}
+                        </div>
+                        <div>
+                            <h4 style="color:#ef4444"><i data-lucide="alert-circle" size="14"></i> Don'ts</h4>
+                            ${rangeInfo.donts.map(item => `
+                            <div class="list-item">
+                                <i data-lucide="x-circle" class="cross" size="16"></i>
+                                <span>${item}</span>
+                            </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons({ root: content });
+        }
+
+        // --- Profile Modal Logic ---
+        function openProfileModal() {
+            document.getElementById('profileModal').classList.add('open');
+            if (!IS_PROFILE_COMPLETE && !window.userProfileCache?.name) {
+                document.getElementById('modalCloseBtn').style.display = 'none';
+            } else {
+                document.getElementById('modalCloseBtn').style.display = 'block';
+            }
+        }
+        function closeProfileModal() {
+            if (!IS_PROFILE_COMPLETE && !window.userProfileCache?.name) return;
+            document.getElementById('profileModal').classList.remove('open');
+        }
+        const ALL_CONDITIONS = [
+            "Asthma", "COPD", "Chronic Bronchitis", "Emphysema", "Pulmonary Fibrosis",
+            "Lung Cancer", "Pneumonia History", "Cough", "Cold / Flu", "Throat Irritation",
+            "Breathing Difficulty", "Allergies", "Rhinitis / Sinusitis", "Dust Sensitivity",
+            "Heart Disease", "Hypertension", "Pregnant Women", "Elderly", "Children",
+            "None of the above"
+        ];
+
+        function buildDiseaseGrid() {
+            const grid = document.getElementById('diseaseGrid');
+            const age = parseInt(document.getElementById('p_age').value) || 0;
+            grid.innerHTML = '';
+
+            ALL_CONDITIONS.forEach(d => {
+                const box = document.createElement('div');
+                box.className = 'disease-box';
+                box.dataset.val = d;
+
+                // Smart Age Logic: Auto-select and LOCK
+                let isSelected = false;
+                if (d === 'Elderly' && age > 60) isSelected = true;
+                if (d === 'Children' && age < 12 && age > 0) isSelected = true;
+
+                // STRICT LOCK: These are always readonly as they are age-based
+                if (d === 'Elderly' || d === 'Children') {
+                    box.classList.add('readonly');
+                    // ENSURE they are ONLY selected if the age condition is met
+                    if (isSelected) {
+                        box.classList.add('selected');
+                    } else {
+                        box.classList.remove('selected');
+                    }
+                } else {
+                    if (isSelected) {
+                        box.classList.add('selected');
+                    } else {
+                        box.classList.remove('selected');
+                    }
+                }
+
+                box.innerHTML = `<i data-lucide="check-square" size="16" class="chk-icon" style="opacity:0.3"></i> <span class="disease-label">${d}</span>`;
+
+                box.addEventListener('click', () => {
+                    if (box.classList.contains('readonly')) return;
+
+                    // Mutual Exclusivity: Elderly vs Children (Manual part, though age locks them)
+                    if (d === 'Elderly') {
+                        const childBox = Array.from(grid.querySelectorAll('.disease-box')).find(b => b.dataset.val === 'Children');
+                        if (childBox) childBox.classList.remove('selected');
+                    } else if (d === 'Children') {
+                        const elderBox = Array.from(grid.querySelectorAll('.disease-box')).find(b => b.dataset.val === 'Elderly');
+                        if (elderBox) elderBox.classList.remove('selected');
+                    }
+
+                    if (d === 'None of the above') {
+                        const isSelectingNone = !box.classList.contains('selected');
+                        if (isSelectingNone) {
+                            // Select None, deselect all others (except readonly)
+                            grid.querySelectorAll('.disease-box').forEach(b => {
+                                if (b.dataset.val !== 'None of the above' && !b.classList.contains('readonly')) {
+                                    b.classList.remove('selected');
+                                    b.style.pointerEvents = 'none';
+                                    b.style.opacity = '0.5';
+                                }
+                            });
+                            box.classList.add('selected');
+                        } else {
+                            // Deselect None, re-enable others
+                            grid.querySelectorAll('.disease-box').forEach(b => {
+                                b.style.pointerEvents = 'auto';
+                                b.style.opacity = '1';
+                            });
+                            box.classList.remove('selected');
+                        }
+                    } else {
+                        // If any other is selected, ensure 'None' is deselected
+                        const noneBox = Array.from(grid.querySelectorAll('.disease-box')).find(b => b.dataset.val === 'None of the above');
+                        if (noneBox) noneBox.classList.remove('selected');
+                        box.classList.toggle('selected');
+                    }
+                });
+                grid.appendChild(box);
+            });
+
+            // Initial state check for 'None'
+            const noneBox = Array.from(grid.querySelectorAll('.disease-box')).find(b => b.dataset.val === 'None of the above');
+            if (noneBox && noneBox.classList.contains('selected')) {
+                grid.querySelectorAll('.disease-box').forEach(b => {
+                    if (b.dataset.val !== 'None of the above') {
+                        b.style.pointerEvents = 'none';
+                        b.style.opacity = '0.5';
+                    }
+                });
+            }
+
+            lucide.createIcons({ root: grid });
+        }
+
+        // Auto-refresh grid when age changes
+        document.getElementById('p_age').addEventListener('input', () => {
+            const currentSelected = [...document.querySelectorAll('.disease-box.selected')].map(b => b.dataset.val);
+            const age = parseInt(document.getElementById('p_age').value) || 0;
+
+            // Clean up restoration list for mutual exclusivity
+            let filteredSelected = currentSelected.filter(v => v !== 'Elderly' && v !== 'Children');
+
+            buildDiseaseGrid();
+            document.querySelectorAll('.disease-box').forEach(b => {
+                if (filteredSelected.includes(b.dataset.val)) b.classList.add('selected');
+            });
+        });
+
+        function selectToggle(groupId, btn, val) {
+            document.getElementById(groupId).querySelectorAll('.toggle-btn').forEach(b =>
+                b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            window[groupId + 'Val'] = val;
+        }
+
+        // jQuery-like contains selector helper for pre-filling
+        HTMLElement.prototype.containsText = function (text) { return this.textContent.includes(text); }
+        document.querySelector = (function (orig) {
+            return function (selector) {
+                if (selector.includes(':contains')) {
+                    const match = selector.match(/(.*?):contains\('(.*?)'\)/);
+                    const els = document.querySelectorAll(match[1]);
+                    for (let el of els) if (el.textContent.includes(match[2])) return el;
+                    return null;
+                }
+                return orig.call(document, selector);
+            };
+        })(document.querySelector);
+
+        async function saveProfile() {
+            const name = document.getElementById('p_name').value.trim();
+            const age = document.getElementById('p_age').value;
+            const gender = window.genderGroupVal;
+            const smoker = window.smokerGroupVal || 'No';
+
+            if (!name || !age || !gender) {
+                Swal.fire({
+                    title: 'Incomplete', text: 'Please fill name, age, and gender.', icon: 'warning',
+                    background: '#1e293b', color: '#fff'
+                });
+                return;
+            }
+
+            const conditions = [...document.querySelectorAll('.disease-box.selected')]
+                .map(b => b.dataset.val)
+                .filter(v => v !== 'None of the above');
+
+            try {
+                const res = await fetch('/save-profile', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, age, gender, smoker, conditions })
+                });
+                if (res.ok) {
+                    Swal.fire({
+                        title: 'Saved', text: 'Profile updated successfully!', icon: 'success', background:
+                            '#1e293b', color: '#fff', timer: 1500, showConfirmButton: false
+                    });
+                    document.getElementById('profileNameNav').textContent = name;
+                    window.location.reload(); // Reload to pass the profile_complete check
+                }
+            } catch (e) { }
+        }
+
+        // --- Trends Logic ---
+        let mainChart, cChart;
+        let currentStation = '';
+
+        async function changeTrendRange() {
+            if (!currentStation) return;
+            const range = document.getElementById('trendRange').value;
+            fetchTrends(currentStation, range);
+        }
+
+        async function fetchTrends(station, range = '24h') {
+            currentStation = station;
+            try {
+                const res = await fetch('/api/aqi-trends', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ station, range })
+                });
+                const data = await res.json();
+                if (data.error) return;
+
+                document.getElementById('trendsSection').style.display = 'block';
+
+                // Update title mapping
+                const titles = { '12h': '12 HOURS', '24h': '24 HOURS', '7d': '7 DAYS', '30d': '30 DAYS' };
+                const icon = range.includes('d') ? 'calendar' : 'clock';
+                document.getElementById('mainTrendTitle').innerHTML =
+                    `<i data-lucide="${icon}" size="14"></i> TREND ANALYSIS (${titles[range]})`;
+
+                renderMainTrendChart(data.trend, range);
+                renderCompChart(data.comparison);
+                lucide.createIcons({ root: document.getElementById('trendsSection') });
+            } catch (e) {
+                console.error("Trend Error:", e);
+            }
+        }
+
+        function renderMainTrendChart(data, range) {
+            const isBar = range === '12h' || range === '24h';
+            const options = {
+                series: [{ name: 'AQI', data: data.map(i => i.aqi) }],
+                chart: {
+                    type: isBar ? 'bar' : 'area',
+                    height: 350,
+                    toolbar: { show: false },
+                    background: 'transparent',
+                    animations: { speed: 400 }
+                },
+                plotOptions: isBar ? { bar: { borderRadius: 6, columnWidth: '60%', distributed: true } } : {},
+                colors: isBar ? data.map(i => i.color) : ['#3b82f6'],
+                stroke: { curve: 'smooth', width: isBar ? 0 : 3 },
+                fill: isBar ? {} : { type: 'gradient', gradient: { opacityFrom: 0.5, opacityTo: 0.1 } },
+                dataLabels: { enabled: false },
+                xaxis: {
+                    categories: data.map(i => i.label),
+                    labels: { style: { colors: '#94a3b8', fontSize: '11px' } },
+                    axisBorder: { show: false }, axisTicks: { show: false }
+                },
+                yaxis: { labels: { style: { colors: '#94a3b8' } } },
+                grid: { borderColor: 'rgba(255,255,255,0.05)', strokeDashArray: 4 },
+                legend: { show: false },
+                tooltip: { theme: 'dark' }
+            };
+            if (mainChart) mainChart.destroy();
+            mainChart = new ApexCharts(document.querySelector("#mainTrendChart"), options);
+            mainChart.render();
+        }
+
+        function renderCompChart(data) {
+            const options = {
+                series: data.map(i => i.aqi),
+                chart: { type: 'donut', height: 280, animations: { speed: 400 } },
+                labels: data.map(i => i.label),
+                colors: data.map(i => i.color),
+                plotOptions: { pie: { donut: { size: '75%', labels: { show: true, total: { show: true, label: 'AQI', color: '#fff' } } } } },
+                legend: { position: 'bottom', labels: { colors: '#94a3b8' } },
+                stroke: { show: false },
+                tooltip: { theme: 'dark' }
+            };
+            if (cChart) cChart.destroy();
+            cChart = new ApexCharts(document.querySelector("#compChart"), options);
+            cChart.render();
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const timeEl = document.getElementById('heroTime');
+            const dateEl = document.getElementById('heroDate');
+            const seasonEl = document.getElementById('heroSeason');
+
+            if (timeEl) {
+                timeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+            if (dateEl) {
+                const options = { day: 'numeric', month: 'long', year: 'numeric' };
+                dateEl.textContent = now.toLocaleDateString('en-GB', options);
+            }
+            if (seasonEl) {
+                const month = now.getMonth();
+                const seasons = ['WINTER', 'WINTER', 'SPRING', 'SPRING', 'SUMMER', 'SUMMER', 'MONSOON', 'MONSOON',
+                    'POST-MONSOON', 'POST-MONSOON', 'WINTER', 'WINTER'];
+                seasonEl.textContent = seasons[month];
+            }
+        }
+        setInterval(updateClock, 10000);
+
+        init();
+    </script>
+</body>
+
+</html>
