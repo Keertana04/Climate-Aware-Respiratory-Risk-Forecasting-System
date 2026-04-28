@@ -11,12 +11,18 @@ Built using **Flask**, **XGBoost**, the **Open-Meteo API**, and the **Groq API (
 - Clean route optimization
 - Historical AQI trend analysis
 
+---
+
 ## 🧠 Project Overview
+
 **“Your AI-Powered Respiratory Health Co-Pilot.”**
 
 CARRFS combines real-time environmental intelligence with Machine Learning and LLM-based summarization to transform complex climate data into personalized, structured health advice.
 
+---
+
 ## ⚙️ Tools & Tech Stack
+
 | Component | Tool / API |
 | :--- | :--- |
 | **Weather/AQI API** | Open-Meteo API |
@@ -26,7 +32,10 @@ CARRFS combines real-time environmental intelligence with Machine Learning and L
 | **Database** | SQLite |
 | **Frontend** | HTML, CSS, JavaScript |
 
+---
+
 ## 📦 Project Architecture
+
 ```text
 User Input (Health Profile & Location)
        ↓
@@ -41,7 +50,10 @@ Groq LLM → Personalized Health Advice Generation
 Dashboard UI (Actionable Insights)
 ```
 
+---
+
 ## 🚀 Features
+
 **1. 🩺 Personalized Risk Forecasting**
 *   **Input:** User Health Profile (Age, Smoker status, Conditions like Asthma/COPD)
 *   **Output:** Low, Moderate, or High risk prediction for outdoor activities.
@@ -57,6 +69,8 @@ Dashboard UI (Actionable Insights)
 **4. 📈 Historical AQI Trends**
 *   **Input:** Location data
 *   **Output:** Visualized 30-day historical air quality metrics.
+
+---
 
 ## 🧩 UI Flow
 
@@ -84,12 +98,17 @@ Calculates Pollutant Exposure per Route
 User Views Map with Cleanest Route Highlighted
 ```
 
+---
+
 ## 📌 Use Cases
+
 | Use Case | Who Benefits | Value Provided |
 | :--- | :--- | :--- |
 | **Daily Health Planning** | Asthma/COPD Patients | Prevents attacks by avoiding severe pollution. |
 | **Fitness & Exercise** | Runners, Cyclists | Identifies the cleanest time and route for outdoor workouts. |
 | **Medical Advisory** | Healthcare Providers | Monitors local environmental health risks for patients. |
+
+---
 
 ## 📊 Example Output
 
@@ -102,6 +121,8 @@ User Views Map with Cleanest Route Highlighted
 *   **Route A (Golf Course Rd):** 25 mins (Avg PM2.5: 185 µg/m³)
 *   **Route B (Internal Sectors):** 28 mins (Avg PM2.5: 95 µg/m³)
 *   **System Recommendation:** Route B (Safer respiratory choice)
+
+---
 
 ## ⚠️ Important Setup Instructions (API Keys Required)
 
@@ -133,11 +154,17 @@ To run this project on your own machine, you **MUST** provide your own Groq API 
    ```
    Or simply run `python app.py` and open your browser to `http://localhost:5000`.
 
+---
+
 ## ⚠️ Data Scope & Limitations
+
 *   **Geographical Constraint:** The Machine Learning models and historical trend analyses in this current version are trained specifically using an extensive dataset from **Gurugram, India**.
 *   **Impact:** While the real-time API fetches accurate data for any global location, the *predictive* modeling risk scores are optimized for Gurugram's specific pollution and climate signatures.
 
+---
+
 ## 🌱 Future Enhancements
+
 *   **🌍 Geographical Expansion:** Scaling the Machine Learning models to support accurate predictions for other major metropolitan areas globally, not just Gurugram.
 *   **📱 Mobile App Integration:** Developing dedicated iOS and Android applications using React Native for a seamless on-the-go experience.
 *   **⌚ Wearable Device Sync:** Integration with Apple Watch and WearOS to push live respiratory risk alerts directly to users' wrists during outdoor activities.
