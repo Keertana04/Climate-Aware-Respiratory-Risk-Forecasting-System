@@ -8,7 +8,8 @@ import pickle, os, json, logging
 from datetime import datetime
 from dotenv import load_dotenv
 from groq import Groq
-from live_fetch import fetch_live_readings, fetch_batch   # Open-Meteo, no key
+from live_fetch import fetch_live_readings, fetch_batch, fetch_historical_readings   # Open-Meteo, no key
+from profile_manager import create_user, get_user, update_health
 
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
@@ -216,7 +217,9 @@ def api_route_precautions():
     worst_aqi = data.get("worst_aqi", avg_aqi)
 
     age = session.get("age", "—")
-    conditions = session.get("conditions", [])
+    chronic_conds = session.get("chronic_conditions", [])
+    temp_conds = session.get("temp_conditions", [])
+    conditions = chronic_conds + temp_conds
     smoker = session.get("smoker", "No")
 
     log.info(f"   🤖 Groq: Generating travel precautions for route (Avg AQI: {avg_aqi})")
@@ -303,20 +306,117 @@ def home():
     session.clear()
     return render_template("index.html")
 
-@app.route("/save-profile", methods=["POST"])
-def save_profile():
+@app.route("/api/signup", methods=["POST"])
+def signup():
+    import re
     d = request.get_json()
-    session.update({
-        "name":d.get("name","User"),"age":d.get("age","—"),
-        "gender":d.get("gender","—"),"smoker":d.get("smoker","No"),
-        "conditions":d.get("conditions",[]),"profile_complete":True
-    })
-    return jsonify({"status":"ok"})
+    email = (d.get("email") or "").strip().lower()
+    phone = re.sub(r'\D', '', (d.get("phone") or "").strip())  # digits only
+
+    # At least one identifier required
+    if not email and not phone:
+        return jsonify({"error": "Email or Phone number is required"}), 400
+
+    # Format validation
+    if email and not re.match(r'^[^\s@]+@[^\s@]+\.[^\s@]+$', email):
+        return jsonify({"error": "Invalid email format."}), 400
+    if phone and not re.match(r'^\d{10}$', phone):
+        return jsonify({"error": "Phone number must be exactly 10 digits."}), 400
+
+    # Required profile fields
+    name = (d.get("name") or "").strip()
+    age  = (d.get("age") or "").strip()
+    gender = (d.get("gender") or "").strip()
+    smoker = (d.get("smoker") or "").strip()
+
+    if not name:
+        return jsonify({"error": "Full Name is required."}), 400
+    try:
+        age_val = int(age)
+        if not (1 <= age_val <= 120):
+            raise ValueError
+    except (ValueError, TypeError):
+        return jsonify({"error": "Age must be a valid number between 1 and 120."}), 400
+    if not gender:
+        return jsonify({"error": "Gender is required."}), 400
+    if not smoker:
+        return jsonify({"error": "Smoker status is required."}), 400
+
+    success, result = create_user(
+        email=email,
+        phone=phone,
+        name=name,
+        age=age,
+        gender=gender,
+        smoker=smoker,
+        chronic_conditions=d.get("chronic_conditions", []),
+        temp_conditions=d.get("temp_conditions", [])
+    )
+    
+    if success:
+        session.update(result)
+        session["profile_complete"] = True
+        return jsonify({"status": "ok"})
+    else:
+        return jsonify({"error": result}), 400
+
+@app.route("/api/login", methods=["POST"])
+def login():
+    import re
+    d = request.get_json()
+    email = (d.get("email") or "").strip().lower()
+    phone = re.sub(r'\D', '', (d.get("phone") or "").strip())  # digits only
+
+    if not email and not phone:
+        return jsonify({"error": "Email or Phone number is required"}), 400
+
+    # Format validation
+    if email and not re.match(r'^[^\s@]+@[^\s@]+\.[^\s@]+$', email):
+        return jsonify({"error": "Invalid email format."}), 400
+    if phone and not re.match(r'^\d{10}$', phone):
+        return jsonify({"error": "Phone number must be exactly 10 digits."}), 400
+
+    user = get_user(email, phone)
+    if user:
+        session.update(user)
+        session["profile_complete"] = True
+        return jsonify({"status": "ok"})
+    else:
+        return jsonify({"error": "User not found. Please sign up."}), 404
+
+
+@app.route("/api/update-health", methods=["POST"])
+def update_health_route():
+    if not session.get("profile_complete"):
+        return jsonify({"error": "unauthorized"}), 401
+    
+    d = request.get_json()
+    email = session.get("email")
+    phone = session.get("phone")
+    contact = session.get("contact") # legacy fallback
+    if not email and not phone and not contact:
+        return jsonify({"error": "missing identity in session"}), 400
+
+    e_val = email or contact
+    p_val = phone or contact
+
+    success, result = update_health(
+        email=e_val,
+        phone=p_val,
+        smoker=d.get("smoker", session.get("smoker", "No")),
+        chronic_conditions=d.get("chronic_conditions", session.get("chronic_conditions", [])),
+        temp_conditions=d.get("temp_conditions", session.get("temp_conditions", []))
+    )
+    if success:
+        session.update(result)
+        return jsonify({"status": "ok"})
+    else:
+        return jsonify({"error": result}), 400
 
 @app.route("/get-profile")
 def get_profile():
     if not session.get("profile_complete"): return jsonify({"error":"no profile"}),401
-    return jsonify({k:session.get(k) for k in ["name","age","gender","smoker","conditions"]})
+    return jsonify({k:session.get(k) for k in ["name","age","gender","email","phone","contact","smoker","chronic_conditions","temp_conditions"]})
 
 @app.route("/logout")
 def logout():
@@ -505,7 +605,9 @@ def analyze_route():
 
     # ── Log user health profile so it can be verified in /logs ──────
     age        = session.get("age",        "—")
-    conditions = session.get("conditions", [])
+    chronic_conds = session.get("chronic_conditions", [])
+    temp_conds = session.get("temp_conditions", [])
+    conditions = chronic_conds + temp_conds
     smoker     = session.get("smoker",     "No")
     log.info(f"   👤 Health profile: Age={age}  Smoker={smoker}  Conditions={conditions or 'None'}")
 
@@ -631,7 +733,10 @@ def predict_station():
     now    = datetime.now()
     season = get_season(now.month)
     age    = session.get("age","—"); gender = session.get("gender","—")
-    smoker = session.get("smoker","No"); conds = session.get("conditions",[])
+    smoker = session.get("smoker","No")
+    chronic_conds = session.get("chronic_conditions", [])
+    temp_conds = session.get("temp_conditions", [])
+    conds = chronic_conds + temp_conds
     precs  = get_precautions(aqi,severity,season,age,gender,smoker,conds)
     
     # Cigarette calculation (Berkeley Earth formula: ~22 ug/m3 PM2.5 ≈ 1 cigarette/day)
@@ -655,50 +760,106 @@ def aqi_trends():
     station = data.get("station")
     range_type = data.get("range", "24h")
     if not station: return jsonify({"error": "No station"}), 400
+    if station not in _station_meta: return jsonify({"error": "Station not found"}), 404
     
-    # Deterministic base from station name
-    seed_val = sum(ord(c) for c in station)
-    base = 100 + (seed_val * 3) % 150
-    
-    trend_data = []
-    
-    if range_type == "12h":
-        for h in range(12):
-            val = base + int(np.sin((h + seed_val)/3) * 40)
-            val = max(10, min(500, val))
-            sev, _ = categorize_aqi(val)
-            trend_data.append({"label": f"{12-h}h", "aqi": val, "color": COLOR_MAP.get(sev, "#888")})
-        trend_data = trend_data[::-1]
-    elif range_type == "24h":
-        for h in range(24):
-            val = base + int(np.sin((h + seed_val)/4) * 30)
-            val = max(10, min(500, val))
-            sev, _ = categorize_aqi(val)
-            trend_data.append({"label": f"{24-h}h", "aqi": val, "color": COLOR_MAP.get(sev, "#888")})
-        trend_data = trend_data[::-1]
-    elif range_type == "7d":
-        days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-        for d in range(7):
-            val = base + int(np.cos((d + seed_val)) * 50)
-            val = max(10, min(500, val))
-            sev, _ = categorize_aqi(val)
-            trend_data.append({"label": days[d], "aqi": val, "color": COLOR_MAP.get(sev, "#888")})
-    elif range_type == "30d":
-        for d in range(30):
-            val = base + int(np.sin((d + seed_val)/5) * 60 + np.random.normal(0, 5))
-            val = max(10, min(500, val))
-            sev, _ = categorize_aqi(val)
-            trend_data.append({"label": f"Day {d+1}", "aqi": val, "color": COLOR_MAP.get(sev, "#888")})
+    meta = _station_meta[station]
+    lat, lon = meta["lat"], meta["lon"]
 
-    # Comparison data (remains stable)
-    comp = [
-        {"label": station, "aqi": base, "color": COLOR_MAP.get(categorize_aqi(base)[0], "#888")},
-        {"label": "National Avg", "aqi": 110, "color": "#94a3b8"}
-    ]
-    
+    # Determine past_days needed to cover the range natively
+    if range_type in ["12h", "24h"]:
+        past_days = 2
+    elif range_type == "7d":
+        past_days = 8
+    elif range_type == "30d":
+        past_days = 31
+    else:
+        past_days = 2
+
+    hist_data = fetch_historical_readings(lat, lon, past_days)
+    if not hist_data or not hist_data.get("time"):
+        return jsonify({"error": "Failed to fetch historical data"}), 503
+
+    times = hist_data["time"]
+    now_iso = datetime.now().strftime("%Y-%m-%dT%H:00")
+    end_idx = 0
+    for i, t in enumerate(times):
+        if t <= now_iso:
+            end_idx = i
+        else:
+            break
+
+    points = []
+    if range_type == "12h":
+        start_idx = max(0, end_idx - 11)
+        for i in range(start_idx, end_idx + 1):
+            hr_str = datetime.fromisoformat(times[i]).strftime("%I %p").lstrip('0')
+            points.append((hr_str, [i]))
+            
+    elif range_type == "24h":
+        start_idx = max(0, end_idx - 23)
+        for i in range(start_idx, end_idx + 1):
+            hrs_ago = end_idx - i
+            if hrs_ago == 0:
+                hr_str = "Now"
+            elif hrs_ago % 4 == 0:
+                hr_str = datetime.fromisoformat(times[i]).strftime("%I %p").lstrip('0')
+            else:
+                hr_str = ""
+            points.append((hr_str, [i]))
+            
+    elif range_type == "7d":
+        start_idx = max(0, end_idx - (7 * 24) + 1)
+        day_groups = {}
+        for i in range(start_idx, end_idx + 1):
+            day_str = datetime.fromisoformat(times[i]).strftime("%a")
+            if day_str not in day_groups: day_groups[day_str] = []
+            day_groups[day_str].append(i)
+        for day, idxs in day_groups.items():
+            points.append((day, idxs))
+            
+    elif range_type == "30d":
+        start_idx = max(0, end_idx - (30 * 24) + 1)
+        day_groups = {}
+        for i in range(start_idx, end_idx + 1):
+            day_str = datetime.fromisoformat(times[i]).strftime("%b %d")
+            if day_str not in day_groups: day_groups[day_str] = []
+            day_groups[day_str].append(i)
+        for day, idxs in day_groups.items():
+            points.append((day, idxs))
+
+    trend_data = []
+    avg_total = 0
+    valid_points = 0
+
+    for label, idxs in points:
+        pm25_vals = [hist_data["pm25"][i] for i in idxs if i < len(hist_data["pm25"]) and hist_data["pm25"][i] is not None]
+        pm10_vals = [hist_data["pm10"][i] for i in idxs if i < len(hist_data["pm10"]) and hist_data["pm10"][i] is not None]
+        co2_vals  = [hist_data["co2"][i] for i in idxs if i < len(hist_data["co2"]) and hist_data["co2"][i] is not None]
+        temp_vals = [hist_data["temp"][i] for i in idxs if i < len(hist_data["temp"]) and hist_data["temp"][i] is not None]
+        hum_vals  = [hist_data["humidity"][i] for i in idxs if i < len(hist_data["humidity"]) and hist_data["humidity"][i] is not None]
+        
+        if not pm25_vals or not temp_vals: 
+            # If no data for this block, skip or use a previous valid point if building a continuous line. 
+            # For now, we just skip it to avoid plotting 0. 
+            continue
+            
+        avg_pm25 = sum(pm25_vals) / len(pm25_vals)
+        avg_pm10 = sum(pm10_vals) / len(pm10_vals) if pm10_vals else 0
+        avg_co2  = sum(co2_vals) / len(co2_vals) if co2_vals else 400
+        avg_temp = sum(temp_vals) / len(temp_vals)
+        avg_hum  = sum(hum_vals) / len(hum_vals) if hum_vals else 50
+        
+        aqi = run_model(lat, lon, avg_pm25, avg_pm10, avg_temp, avg_hum, avg_co2)
+        sev, _ = categorize_aqi(aqi)
+        trend_data.append({"label": label, "aqi": aqi, "color": COLOR_MAP.get(sev, "#888")})
+        
+        avg_total += aqi
+        valid_points += 1
+
+    station_avg = int(round(avg_total / valid_points)) if valid_points > 0 else 0
+
     return jsonify({
         "trend": trend_data,
-        "comparison": comp,
         "range": range_type
     })
 
@@ -877,7 +1038,105 @@ def compare_routes():
         "user_profile":{"age":age,"conditions":conditions,"smoker":smoker}
     })
 
+@app.route("/api/assistant-chat", methods=["POST"])
+def assistant_chat():
+    data = request.json
+    message = data.get("message", "")
+    profile = data.get("profile", {})
+    context = data.get("context", "dashboard")
+    
+    if not message:
+        return jsonify({"reply": "I'm here to help!", "recovered": [], "added_chronic": [], "added_temp": []})
+        
+    chronic = profile.get("chronic_conditions", [])
+    temp = profile.get("temp_conditions", [])
+    all_conditions = chronic + temp
+    
+    page_instructions = ""
+    if context == "route":
+        page_instructions = "The user is currently on the Route Optimization page. You should give them advice about travel, pollution on their routes, and general respiratory precautions."
+    else:
+        page_instructions = "The user is currently on their Health Dashboard. You should give them advice about managing their existing conditions, new symptoms, or general wellness."
+    
+    if message == "GREETING_TRIGGER":
+        prompt = f"""You are CARRFS Health Assistant. The user just logged in.
+Their known conditions: {', '.join(all_conditions) if all_conditions else 'None'}.
+If they have conditions, greet them warmly and ask specifically how their conditions are feeling today (max 2 sentences).
+If they have no conditions, just say "Hello! How are you feeling today?" (1 sentence).
+Return JSON EXACTLY in this format: {{"reply": "...", "recovered": [], "added_chronic": [], "added_temp": []}}"""
+    else:
+        prompt = f"""You are CARRFS Health Assistant, a friendly and concise AI doctor.
+The user's current known CHRONIC conditions (long-term, do NOT remove unless explicitly named): {', '.join(chronic) if chronic else 'None'}.
+The user's current known TEMPORARY conditions (short-term, clear these if they feel better): {', '.join(temp) if temp else 'None'}.
+{page_instructions}
+User message: "{message}"
+
+Your tasks:
+1. Provide a short, empathetic response (max 2-3 sentences).
+2. If the user says they are "feeling better", "good", or generally recovered, add ALL of their TEMPORARY conditions to the "recovered" JSON array to clear them. NEVER add CHRONIC conditions to the "recovered" array unless they specifically name the chronic disease and say it's cured.
+3. ONLY if the user explicitly states they are currently suffering from, or diagnosed with a NEW condition (not in their known list), categorize it as either "added_chronic" or "added_temp" and add the clinical name to the respective array.
+
+Return EXACTLY a valid JSON object with four keys: "reply" (string), "recovered" (list of strings), "added_chronic" (list of strings), "added_temp" (list of strings).
+Example format:
+{{"reply": "...", "recovered": ["..."], "added_chronic": ["..."], "added_temp": ["..."]}}
+"""
+
+    try:
+        completion = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3,
+            response_format={"type": "json_object"}
+        )
+        response_text = completion.choices[0].message.content.strip()
+        parsed = json.loads(response_text)
+        
+        recovered_list = parsed.get("recovered", [])
+        valid_recovered = [c for c in recovered_list if c in all_conditions]
+        
+        return jsonify({
+            "reply": parsed.get("reply", "I am glad to hear that. Stay safe!"),
+            "recovered": valid_recovered,
+            "added_chronic": parsed.get("added_chronic", []),
+            "added_temp": parsed.get("added_temp", [])
+        })
+    except Exception as e:
+        log.error(f"Groq Assistant Chat Error: {e}")
+        return jsonify({"reply": "Sorry, I am having trouble connecting to my brain right now. Please try again.", "recovered": [], "added_chronic": [], "added_temp": []}), 500
+
+@app.route("/api/suggest-condition", methods=["POST"])
+def suggest_condition():
+    data = request.json
+    description = data.get("description", "")
+    
+    CHRONIC_CONDITIONS = [
+        "Asthma", "COPD", "Chronic Bronchitis", "Emphysema", "Pulmonary Fibrosis",
+        "Lung Cancer", "Pneumonia History", "Heart Disease", "Hypertension", "Allergies",
+        "Dust Sensitivity"
+    ]
+    
+    prompt = f"""The user is trying to add a medical condition to their profile, but it is not in the standard list.
+User's description: "{description}"
+
+Standard list:
+{', '.join(CHRONIC_CONDITIONS)}
+
+Analyze the description. If it closely matches or is a synonym for one of the standard conditions, return exactly that condition string.
+If it is completely different, return a short, properly capitalized clinical name for what they described (max 3 words).
+Reply ONLY with the condition name. No extra text, no quotes."""
+
+    try:
+        completion = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.2
+        )
+        suggestion = completion.choices[0].message.content.strip().replace('"', '')
+        return jsonify({"suggestion": suggestion})
+    except Exception as e:
+        log.error(f"Groq Suggestion Error: {e}")
+        return jsonify({"error": "Failed to generate suggestion"}), 500
 
 if __name__ == "__main__":
-    print("CARRFS at http://localhost:5002")
-    app.run(debug=True, port=5002)
+    print("CARRFS at http://localhost:5005")
+    app.run(debug=True, port=5005)

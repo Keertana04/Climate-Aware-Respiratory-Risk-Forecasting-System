@@ -9,7 +9,25 @@
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        // Check for saved theme
+        const storedTheme = localStorage.getItem('carrfs_theme');
+        if (storedTheme === 'light') {
+            document.documentElement.classList.add('light-theme');
+        }
+        function toggleTheme() {
+            document.documentElement.classList.toggle('light-theme');
+            const isLight = document.documentElement.classList.contains('light-theme');
+            localStorage.setItem('carrfs_theme', isLight ? 'light' : 'dark');
+        }
+    </script>
     <style>
+        html {
+            font-size: 80%; /* Global font scale — reduces all rem-based sizes uniformly */
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -28,6 +46,33 @@
             --font-hdr: 'Outfit', sans-serif;
             --font-main: 'Inter', sans-serif;
         }
+
+        html.light-theme {
+            --bg: #f8fafc;
+            --text: #0f172a;
+            --muted: #475569;
+            --border: rgba(0, 0, 0, 0.1);
+            --glass: rgba(255, 255, 255, 0.85);
+        }
+        html.light-theme .sign-in-btn { color: var(--text) !important; border-color: rgba(0,0,0,0.1); }
+        html.light-theme p.subtitle { color: var(--muted) !important; }
+        html.light-theme .feature-card { background: rgba(255, 255, 255, 0.7); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        html.light-theme .feature-card:hover { background: rgba(255, 255, 255, 1); box-shadow: 0 20px 40px rgba(0,0,0,0.1); border-color: var(--blue); }
+        html.light-theme .f-title { color: var(--text); }
+        html.light-theme .modal-card { background: #ffffff; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1); }
+        html.light-theme .modal-title { color: var(--text); }
+        html.light-theme .form-control { background: #f1f5f9; border-color: rgba(0, 0, 0, 0.1); color: var(--text); }
+        html.light-theme select.form-control option { background: #ffffff; color: var(--text); }
+        html.light-theme .form-group label { color: #334155; }
+        html.light-theme .choices__inner { background: #f1f5f9 !important; border-color: rgba(0, 0, 0, 0.1) !important; color: var(--text) !important; }
+        html.light-theme .choices__input { color: var(--text) !important; }
+        html.light-theme .choices__list--dropdown { background: #ffffff !important; border-color: rgba(0, 0, 0, 0.1) !important; }
+        html.light-theme .choices__list--dropdown .choices__item { color: var(--text) !important; }
+        html.light-theme .bg-grid { background-image: linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px); }
+        html.light-theme .bg-grid { background-image: linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px); }
+        html.light-theme .theme-toggle { background: rgba(0,0,0,0.05); color: #0f172a; border: 1px solid rgba(0,0,0,0.1); }
+        html.light-theme .theme-toggle:hover { background: rgba(0,0,0,0.1); }
+        html.light-theme .logo-text { background: linear-gradient(135deg, #0f172a 30%, var(--blue)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 
         html,
         body {
@@ -87,7 +132,7 @@
 
         .logo {
             font-family: var(--font-hdr);
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: 800;
             letter-spacing: 1px;
             display: flex;
@@ -140,7 +185,7 @@
 
         h1 {
             font-family: var(--font-hdr);
-            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-size: clamp(3rem, 8vw, 6rem);
             font-weight: 800;
             line-height: 1;
             margin-bottom: 2rem;
@@ -157,7 +202,7 @@
         }
 
         p.subtitle {
-            font-size: 1.15rem;
+            font-size: 1.4rem;
             color: #fff !important;
             /* Pure white */
             max-width: 600px;
@@ -173,7 +218,7 @@
             color: #fff;
             padding: 1rem 2.5rem;
             border-radius: 50px;
-            font-size: 1.1rem;
+            font-size: 1.35rem;
             font-weight: 700;
             /* Increased weight */
             text-decoration: none;
@@ -189,7 +234,7 @@
         .sign-in-btn {
             color: #fff !important;
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 1.15rem;
             font-weight: 800;
             border: 1px solid #3b82f6;
             padding: 0.5rem 1.25rem;
@@ -245,14 +290,14 @@
         }
 
         .f-title {
-            font-size: 1.1rem;
+            font-size: 1.4rem;
             font-weight: 700;
             margin-bottom: 0.6rem;
             color: #f1f5f9;
         }
 
         .f-desc {
-            font-size: 0.9rem;
+            font-size: 1.05rem;
             color: var(--muted);
             line-height: 1.6;
         }
@@ -359,6 +404,187 @@
                 padding: 0 1rem;
             }
         }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(3, 7, 18, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: #0f172a;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 480px;
+            padding: 2.5rem;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .modal-title {
+            font-family: var(--font-hdr);
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #e2e8f0;
+        }
+
+        .form-control {
+            width: 100%;
+            background: rgba(3, 7, 18, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            color: #fff;
+            font-family: var(--font-main);
+            transition: border-color 0.2s;
+        }
+
+        select.form-control option {
+            background: #0f172a;
+            color: #fff;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            color: #fff;
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: opacity 0.2s;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+        }
+
+        .switch-mode {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        .switch-mode a {
+            color: var(--blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .switch-mode a:hover {
+            text-decoration: underline;
+        }
+
+        /* Choices.js Dark Mode Overrides */
+        .choices {
+            margin-bottom: 0;
+        }
+        .choices__inner {
+            background: rgba(3, 7, 18, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            min-height: 44px;
+        }
+        .choices.is-focused .choices__inner {
+            border-color: var(--blue);
+        }
+        .choices__input {
+            background: transparent;
+            color: #fff !important;
+        }
+        .choices__list--dropdown {
+            background: #0f172a !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            z-index: 3000;
+        }
+        .choices__list--dropdown .choices__item {
+            color: #fff !important;
+            background: transparent;
+        }
+        .choices__list--dropdown .choices__item--selectable.is-highlighted {
+            background: rgba(59, 130, 246, 0.4) !important;
+            color: #fff !important;
+        }
+        .choices__list--multiple .choices__item {
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            border: none;
+            color: #fff;
+            border-radius: 6px;
+        }
+        .choices__button {
+            border-left: 1px solid rgba(255,255,255,0.2);
+        }
     </style>
 </head>
 
@@ -378,7 +604,13 @@
                 <span class="logo-text">CARRFS</span>
             </div>
         </a>
-        <a href="/dashboard" class="sign-in-btn">Sign In</a>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <button onclick="toggleTheme()" class="theme-toggle" id="themeToggleBtn" title="Toggle light / dark theme" style="background: rgba(59,130,246,0.18); border: 1.5px solid rgba(96,165,250,0.6); border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; color: #93c5fd; cursor: pointer; transition: all 0.25s; box-shadow: 0 0 10px rgba(59,130,246,0.25);">
+                <i data-lucide="sun-moon" style="width: 20px; height: 20px;"></i>
+            </button>
+            <button onclick="openModal('signIn')" class="sign-in-btn"
+                style="cursor: pointer; background: transparent; color: white;">Sign In</button>
+        </div>
     </nav>
 
     <main class="hero">
@@ -391,9 +623,10 @@
             offering personalized travel precautions tailored to your health profile.
         </p>
 
-        <a href="/dashboard" class="cta-btn" style="animation: fadeInUp 0.8s ease-out 0.4s both;">
-            Launch Application <i data-lucide="arrow-right"></i>
-        </a>
+        <button onclick="openModal('signUp')" class="cta-btn"
+            style="animation: fadeInUp 0.8s ease-out 0.4s both; border: none; font-family: var(--font-main); cursor: pointer;">
+            Sign Up to Launch <i data-lucide="arrow-right"></i>
+        </button>
 
         <div class="features">
             <div class="feature-card">
@@ -417,8 +650,278 @@
         </div>
     </main>
 
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal()"><i data-lucide="x"></i></button>
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Sign In</h2>
+                <p style="color: var(--muted); font-size: 0.9rem;" id="modalSubtitle">Welcome back to CARRFS</p>
+            </div>
+
+            <form id="authForm" onsubmit="handleAuth(event)">
+                <!-- Fields for Sign Up only -->
+                <div id="signUpFields" style="display: none;">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="name" class="form-control" placeholder="John Doe">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Age</label>
+                            <input type="number" id="age" class="form-control" placeholder="30" min="1" max="120">
+                        </div>
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <select id="gender" class="form-control" required>
+                                <option value="" disabled selected>Select</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Smoker?</label>
+                        <select id="smoker" class="form-control" required>
+                            <option value="" disabled selected>Select</option>
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Chronic Conditions</label>
+                        <select id="chronic_conditions" multiple></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Temporary Conditions</label>
+                        <select id="temp_conditions" multiple></select>
+                    </div>
+                </div>
+
+                <!-- Always visible -->
+                <div class="form-group" style="margin-bottom: 0.8rem;">
+                    <label>Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="user@example.com" autocomplete="email">
+                    <div id="emailHint" style="font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem;">Must be a valid email (e.g. user@example.com).</div>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="phone" class="form-control" placeholder="10-digit number" maxlength="10" pattern="[0-9]{10}" autocomplete="tel">
+                    <div id="phoneHint" style="font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem;">Exactly 10 digits, numbers only. Provide email or phone (or both).</div>
+                </div>
+
+                <div id="errorAlert"
+                    style="display: none; color: #ef4444; font-size: 0.85rem; margin-bottom: 1rem; text-align: center;">
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">Sign In</button>
+            </form>
+
+            <div class="switch-mode">
+                <span id="switchText">Don't have an account?</span>
+                <a href="#" onclick="toggleMode(event)" id="switchLink">Sign Up</a>
+            </div>
+        </div>
+    </div>
+
     <script>
         lucide.createIcons();
+
+        let currentMode = 'signIn'; // or 'signUp'
+        
+        const CHRONIC_CONDITIONS = [
+            { value: "Asthma", label: "Asthma" },
+            { value: "COPD", label: "COPD" },
+            { value: "Chronic Bronchitis", label: "Chronic Bronchitis" },
+            { value: "Emphysema", label: "Emphysema" },
+            { value: "Pulmonary Fibrosis", label: "Pulmonary Fibrosis" },
+            { value: "Lung Cancer", label: "Lung Cancer" },
+            { value: "Pneumonia History", label: "Pneumonia History" },
+            { value: "Heart Disease", label: "Heart Disease" },
+            { value: "Hypertension", label: "Hypertension" },
+            { value: "Allergies", label: "Allergies" },
+            { value: "Dust Sensitivity", label: "Dust Sensitivity" },
+            { value: "Pregnant Women", label: "Pregnant Women" },
+            { value: "Elderly", label: "Elderly" },
+            { value: "Children", label: "Children" }
+        ];
+        const TEMPORARY_CONDITIONS = [
+            { value: "Cough", label: "Cough" },
+            { value: "Cold / Flu", label: "Cold / Flu" },
+            { value: "Throat Irritation", label: "Throat Irritation" },
+            { value: "Breathing Difficulty", label: "Breathing Difficulty" },
+            { value: "Rhinitis / Sinusitis", label: "Rhinitis / Sinusitis" }
+        ];
+
+        let chronicChoices, tempChoices;
+        let choicesInitialized = false;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Deferred Initialization
+        });
+
+        function openModal(mode) {
+            currentMode = mode;
+            document.getElementById('authModal').classList.add('active');
+            updateModalUI();
+        }
+
+        function closeModal() {
+            document.getElementById('authModal').classList.remove('active');
+            document.getElementById('errorAlert').style.display = 'none';
+        }
+
+        function toggleMode(e) {
+            e.preventDefault();
+            currentMode = currentMode === 'signIn' ? 'signUp' : 'signIn';
+            updateModalUI();
+        }
+
+        function updateModalUI() {
+            document.getElementById('errorAlert').style.display = 'none';
+            if (currentMode === 'signIn') {
+                document.getElementById('modalTitle').innerText = 'Sign In';
+                document.getElementById('modalSubtitle').innerText = 'Welcome back to CARRFS';
+                document.getElementById('signUpFields').style.display = 'none';
+                document.getElementById('submitBtn').innerText = 'Sign In';
+                document.getElementById('switchText').innerText = "Don't have an account?";
+                document.getElementById('switchLink').innerText = "Sign Up";
+
+                // Remove required from signup fields
+                document.getElementById('name').required = false;
+                document.getElementById('age').required = false;
+                document.getElementById('gender').required = false;
+                document.getElementById('smoker').required = false;
+            } else {
+                document.getElementById('modalTitle').innerText = 'Sign Up';
+                document.getElementById('modalSubtitle').innerText = 'Create your health profile';
+                document.getElementById('signUpFields').style.display = 'block';
+                document.getElementById('submitBtn').innerText = 'Sign Up';
+                document.getElementById('switchText').innerText = "Already have an account?";
+                document.getElementById('switchLink').innerText = "Sign In";
+
+                // Add required to signup fields
+                document.getElementById('name').required = true;
+                document.getElementById('age').required = true;
+                document.getElementById('gender').required = true;
+                document.getElementById('smoker').required = true;
+                
+                // Initialize Choices now that display is block
+                if (!choicesInitialized) {
+                    chronicChoices = new Choices('#chronic_conditions', { removeItemButton: true, searchPlaceholderValue: 'Search chronic...' });
+                    chronicChoices.setChoices(CHRONIC_CONDITIONS, 'value', 'label', false);
+
+                    tempChoices = new Choices('#temp_conditions', { removeItemButton: true, searchPlaceholderValue: 'Search temporary...' });
+                    tempChoices.setChoices(TEMPORARY_CONDITIONS, 'value', 'label', false);
+                    choicesInitialized = true;
+                }
+            }
+        }
+
+        // ── Validation helpers ──────────────────────────────────────────────
+        function isValidEmail(val) {
+            // Standard email regex check
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+        }
+
+        function isValidPhone(val) {
+            // Exactly 10 numeric digits
+            return /^[0-9]{10}$/.test(val);
+        }
+
+        async function handleAuth(e) {
+            e.preventDefault();
+            const emailRaw = document.getElementById('email').value.trim();
+            const phoneRaw = document.getElementById('phone').value.replace(/\D/g, '').trim(); // strip non-digits
+            const errDiv = document.getElementById('errorAlert');
+            errDiv.style.display = 'none';
+
+            // ── At least one identifier required ──────────────────────────
+            if (!emailRaw && !phoneRaw) {
+                errDiv.innerText = 'Please provide an Email Address or a 10-digit Phone Number.';
+                errDiv.style.display = 'block';
+                return;
+            }
+
+            // ── Email format validation (if provided) ─────────────────────
+            if (emailRaw && !isValidEmail(emailRaw)) {
+                errDiv.innerText = 'Invalid email format. Please enter a valid email (e.g. user@example.com).';
+                errDiv.style.display = 'block';
+                return;
+            }
+
+            // ── Phone validation (if provided) ────────────────────────────
+            if (phoneRaw && !isValidPhone(phoneRaw)) {
+                errDiv.innerText = 'Phone number must be exactly 10 digits (numbers only).';
+                errDiv.style.display = 'block';
+                return;
+            }
+
+            // ── SignUp-specific field validation ──────────────────────────
+            if (currentMode === 'signUp') {
+                const name = document.getElementById('name').value.trim();
+                const age  = document.getElementById('age').value.trim();
+                const gender = document.getElementById('gender').value;
+                const smoker = document.getElementById('smoker').value;
+
+                if (!name) {
+                    errDiv.innerText = 'Full Name is required.';
+                    errDiv.style.display = 'block';
+                    return;
+                }
+                if (!age || isNaN(Number(age)) || Number(age) < 1 || Number(age) > 120) {
+                    errDiv.innerText = 'Please enter a valid Age (1–120).';
+                    errDiv.style.display = 'block';
+                    return;
+                }
+                if (!gender) {
+                    errDiv.innerText = 'Please select a Gender.';
+                    errDiv.style.display = 'block';
+                    return;
+                }
+                if (!smoker) {
+                    errDiv.innerText = 'Please specify Smoker status.';
+                    errDiv.style.display = 'block';
+                    return;
+                }
+            }
+
+            let endpoint = currentMode === 'signIn' ? '/api/login' : '/api/signup';
+            let payload = { email: emailRaw, phone: phoneRaw };
+
+            if (currentMode === 'signUp') {
+                payload = {
+                    email: emailRaw,
+                    phone: phoneRaw,
+                    name: document.getElementById('name').value.trim(),
+                    age: document.getElementById('age').value.trim(),
+                    gender: document.getElementById('gender').value,
+                    smoker: document.getElementById('smoker').value,
+                    chronic_conditions: chronicChoices ? chronicChoices.getValue(true) : [],
+                    temp_conditions: tempChoices ? tempChoices.getValue(true) : []
+                };
+            }
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (!res.ok) {
+                    errDiv.innerText = data.error || 'Authentication failed';
+                    errDiv.style.display = 'block';
+                } else {
+                    window.location.href = '/dashboard';
+                }
+            } catch (err) {
+                errDiv.innerText = 'Network error occurred';
+                errDiv.style.display = 'block';
+            }
+        }
     </script>
 </body>
 

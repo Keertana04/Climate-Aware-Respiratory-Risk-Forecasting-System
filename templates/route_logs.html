@@ -263,13 +263,40 @@
         .empty-state svg {
             opacity: .3
         }
+
+        html.light-theme body { background: #f8fafc; color: #0f172a; }
+        html.light-theme nav { background: #ffffff; border-color: rgba(0,0,0,0.1); }
+        html.light-theme .nav-right a { color: #475569; }
+        html.light-theme .nav-right a:hover { color: #0f172a; }
+        html.light-theme .toolbar { background: #f1f5f9; border-color: rgba(0,0,0,0.1); }
+        html.light-theme .tb-btn { border-color: rgba(0,0,0,0.2); color: #0f172a; background: #ffffff; }
+        html.light-theme .tb-btn:hover { background: #e2e8f0; }
+        html.light-theme .log-ts { color: #64748b; }
+        html.light-theme .log-msg { color: #334155; }
+        html.light-theme .log-row:hover { background: rgba(0,0,0,0.05); }
+        html.light-theme .empty-state { color: #64748b; }
+        html.light-theme .tb-sep { background: rgba(0,0,0,0.1); }
+        html.light-theme .log-wrap::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); }
+        html.light-theme .theme-toggle { background: transparent; border: 1px solid rgba(0,0,0,0.2); border-radius: 4px; padding: 2px 6px; cursor: pointer; color: #0f172a; }
     </style>
+    <script>
+        const storedTheme = localStorage.getItem('carrfs_theme');
+        if (storedTheme === 'light') {
+            document.documentElement.classList.add('light-theme');
+        }
+        function toggleTheme() {
+            document.documentElement.classList.toggle('light-theme');
+            const isLight = document.documentElement.classList.contains('light-theme');
+            localStorage.setItem('carrfs_theme', isLight ? 'light' : 'dark');
+        }
+    </script>
 </head>
 
 <body>
     <nav>
         <div class="logo">CARRFS — Backend Logs</div>
         <div class="nav-right">
+            <button onclick="toggleTheme()" class="theme-toggle" style="margin-right: 1rem; border:1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 0.2rem 0.5rem; background:transparent; color:inherit; cursor:pointer;">🌓 Theme</button>
             <span class="badge live" id="liveBadge">● LIVE</span>
             <a href="/map">🗺 Route Map</a>
             <a href="/dashboard">Dashboard</a>

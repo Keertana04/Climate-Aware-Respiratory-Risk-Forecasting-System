@@ -66,6 +66,49 @@ def fetch_live_readings(lat: float, lon: float) -> dict | None:
         return None
 
 
+def fetch_historical_readings(lat: float, lon: float, past_days: int) -> dict | None:
+    """
+    Fetch historical PM2.5, PM10, CO2, Temp, Humidity for one lat/lon.
+    Uses 'past_days' parameter in Open-Meteo API.
+    Returns: dict {"time": [...], "pm25": [...], "pm10": [...], ...}
+    """
+    params = {"latitude": lat, "longitude": lon, "past_days": past_days, "timezone": "auto"}
+
+    def get_aqi():
+        aqi_params = {
+            **params, 
+            "hourly": "pm10,pm2_5,carbon_dioxide", 
+            "cell_selection": "nearest"
+        }
+        r = SESSION.get(AQI_URL, params=aqi_params, timeout=12)
+        r.raise_for_status()
+        return r.json().get("hourly", {})
+
+    def get_wthr():
+        r = SESSION.get(WTHR_URL, params={**params, "hourly": "temperature_2m,relative_humidity_2m"}, timeout=12)
+        r.raise_for_status()
+        return r.json().get("hourly", {})
+
+    try:
+        with ThreadPoolExecutor(max_workers=2) as ex:
+            f_aqi  = ex.submit(get_aqi)
+            f_wthr = ex.submit(get_wthr)
+            aqi_data  = f_aqi.result()
+            wthr_data = f_wthr.result()
+
+        return {
+            "time": aqi_data.get("time", []),
+            "pm25": aqi_data.get("pm2_5", []),
+            "pm10": aqi_data.get("pm10", []),
+            "co2": aqi_data.get("carbon_dioxide", []),
+            "temp": wthr_data.get("temperature_2m", []),
+            "humidity": wthr_data.get("relative_humidity_2m", [])
+        }
+    except Exception as e:
+        print(f"⚠  Historical fetch error: {e}")
+        return None
+
+
 def fetch_batch(station_list: list[dict], max_workers: int = 16) -> dict:
     """
     Fetch live readings for MANY stations simultaneously.

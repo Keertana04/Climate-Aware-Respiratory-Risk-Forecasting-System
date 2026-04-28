@@ -21,6 +21,17 @@
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
+    <script>
+        const storedTheme = localStorage.getItem('carrfs_theme');
+        if (storedTheme === 'light') {
+            document.documentElement.classList.add('light-theme');
+        }
+        function toggleTheme() {
+            document.documentElement.classList.toggle('light-theme');
+            const isLight = document.documentElement.classList.contains('light-theme');
+            localStorage.setItem('carrfs_theme', isLight ? 'light' : 'dark');
+        }
+    </script>
     <style>
         :root {
             --bg: #030712;
@@ -28,11 +39,56 @@
             --glass-border: rgba(255, 255, 255, 0.08);
             --text: #f8fafc;
             --muted: #f1f5f9;
-            /* Brightened for consistency */
             --blue: #3b82f6;
             --purple: #8b5cf6;
             --font-main: 'Inter', sans-serif;
             --font-hdr: 'Outfit', sans-serif;
+        }
+
+        html.light-theme {
+            --bg: #f8fafc;
+            --text: #0f172a;
+            --muted: #475569;
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --glass: rgba(255, 255, 255, 0.85);
+        }
+        html.light-theme nav { background: #ffffff !important; }
+        html.light-theme .nav-links a { color: var(--text) !important; }
+        html.light-theme .profile-btn { color: var(--text) !important; background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.1); }
+        html.light-theme .sidebar { background: #ffffff !important; border-color: rgba(0,0,0,0.1) !important; box-shadow: 20px 0 50px rgba(0,0,0,0.05); }
+        html.light-theme .sidebar label, html.light-theme .sidebar .card-title { color: var(--text) !important; }
+        html.light-theme .card-inner { background: #f8fafc; border-color: rgba(0,0,0,0.1); }
+        html.light-theme .card-inner:hover { border-color: var(--blue); background: #ffffff; }
+        html.light-theme .field-label { color: var(--text) !important; }
+        html.light-theme .choices__list--dropdown { background-color: #ffffff !important; border-color: rgba(0,0,0,0.1) !important; }
+        html.light-theme .choices__item--selectable { color: var(--text) !important; }
+        html.light-theme .choices__inner { background: #f1f5f9 !important; border-color: rgba(0,0,0,0.1) !important; color: var(--text) !important; }
+        html.light-theme .route-marker-item { background: #f8fafc; border-color: rgba(0,0,0,0.1); }
+        html.light-theme .route-marker-item:hover { background: #ffffff; border-color: var(--blue); }
+        html.light-theme .route-marker-item.sel { background: rgba(59, 130, 246, 0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-color: var(--blue); }
+        html.light-theme .m-name { color: var(--text); }
+        html.light-theme .m-aqi .val { color: var(--text); }
+        html.light-theme .stat-box { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.1); }
+        html.light-theme .prec-item { background: rgba(0,0,0,0.02); color: var(--text); border-color: rgba(0,0,0,0.1); border-left-color: var(--purple); }
+        html.light-theme .steps-wrap { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.1); }
+        html.light-theme .step { color: var(--muted); }
+        html.light-theme .step.active { color: var(--text); background: rgba(59, 130, 246, 0.1); }
+        html.light-theme .modal { background: #ffffff; border-color: rgba(0,0,0,0.1); }
+        html.light-theme .modal-close:hover { color: var(--text); }
+        html.light-theme .form-input { background: #f1f5f9 !important; border-color: rgba(0,0,0,0.1) !important; color: var(--text) !important; }
+        html.light-theme .toggle-btn { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.1); color: var(--muted); }
+        html.light-theme .toggle-btn.active { background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; color: #3b82f6; }
+        html.light-theme .disease-box { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.1); }
+        html.light-theme .disease-box.selected { border-color: var(--purple); background: rgba(139, 92, 246, 0.05); border-style: dashed; }
+        html.light-theme .disease-label { color: var(--muted); }
+        html.light-theme .disease-box.selected .disease-label { color: var(--text); }
+        html.light-theme .disease-box.selected .chk-icon { border-color: var(--purple); opacity: 0.8; }
+        html.light-theme .theme-toggle { background: rgba(0,0,0,0.05); color: var(--text); border: 1px solid rgba(0,0,0,0.1); }
+        html.light-theme .theme-toggle:hover { background: rgba(0,0,0,0.1); }
+        html.light-theme .logo-text { background: linear-gradient(135deg, #0f172a 30%, var(--blue)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+        html {
+            font-size: 80%; /* Global font scale — reduces all rem-based sizes uniformly */
         }
 
         * {
@@ -105,7 +161,7 @@
 
         .logo {
             font-family: var(--font-hdr);
-            font-size: 1.4rem;
+            font-size: 2.2rem;
             font-weight: 800;
             letter-spacing: 1px;
             display: flex;
@@ -137,7 +193,7 @@
             color: #fff !important;
             /* Force bright white consistency */
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 1.5rem;
             font-weight: 500;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
@@ -175,7 +231,7 @@
             border: 1px solid var(--glass-border);
             border-radius: 12px;
             padding: 0.45rem 1.1rem;
-            font-size: 0.85rem;
+            font-size: 1.4rem;
             cursor: pointer;
             transition: all 0.3s;
             color: #fff;
@@ -278,7 +334,7 @@
 
         .card-title {
             font-family: var(--font-hdr);
-            font-size: 0.75rem;
+            font-size: 1.3rem;
             font-weight: 900;
             /* Increased weight */
             letter-spacing: 2px;
@@ -292,7 +348,7 @@
         }
 
         .field-label {
-            font-size: 0.85rem;
+            font-size: 1.4rem;
             font-weight: 700;
             color: #fff !important;
             /* Pure white */
@@ -311,6 +367,7 @@
 
         .choices__item--selectable {
             color: #fff !important;
+            font-size: 1.5rem !important;
         }
 
         .choices__item--selectable.is-highlighted {
@@ -324,6 +381,7 @@
             border-radius: 14px !important;
             color: #fff !important;
             min-height: 52px !important;
+            font-size: 1.4rem !important;
             display: flex;
             align-items: center;
             padding: 0 1rem !important;
@@ -337,7 +395,7 @@
             border: none;
             border-radius: 16px;
             color: #fff;
-            font-size: 1rem;
+            font-size: 1.6rem;
             font-weight: 800;
             /* Extra bold */
             cursor: pointer;
@@ -374,7 +432,7 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            font-size: 0.85rem;
+            font-size: 1.2rem;
             color: #94a3b8;
             padding: 0.4rem 0.6rem;
             border-radius: 8px;
@@ -451,7 +509,7 @@
 
         .m-name {
             font-weight: 700;
-            font-size: 0.95rem;
+            font-size: 1.25rem;
             margin-bottom: 0.5rem;
             font-family: var(--font-hdr);
         }
@@ -460,12 +518,12 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            font-size: 0.85rem;
+            font-size: 1.15rem;
             font-weight: 600;
         }
 
         .m-aqi .val {
-            font-size: 1.1rem;
+            font-size: 1.5rem;
             font-weight: 800;
             color: #fff;
         }
@@ -572,61 +630,68 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .modal-close {
-            cursor: pointer;
-            color: #94a3b8;
-            background: none;
-            border: none;
-            transition: all 0.2s;
-        }
-
-        .modal-close:hover {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            border-color: rgba(239, 68, 68, 0.2);
+            margin-bottom: 1.5rem;
         }
 
         .modal-title {
-            font-size: 1.2rem;
+            font-size: 1.6rem;
             font-weight: 700;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
+        .modal-close {
+            cursor: pointer;
+            color: var(--muted);
+            background: none;
+            border: none;
+        }
+
+        .modal-close:hover {
+            color: var(--text);
+        }
+
         .form-input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            border-radius: 14px;
-            padding: 1rem;
-            color: #fff;
+            background: #111827 !important;
+            border: 1px solid #475569 !important;
+            border-radius: 12px !important;
+            color: #fff !important;
+            padding: 0.85rem 1.25rem;
             width: 100%;
-            outline: none;
-            transition: border-color 0.3s;
+            font-size: 1.1rem;
+            transition: all 0.3s;
         }
 
         .form-input:focus {
-            border-color: var(--blue);
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            outline: none;
+        }
+
+        .toggle-row {
+            display: flex;
+            gap: 0.4rem;
+            margin-top: 0.2rem;
         }
 
         .toggle-btn {
-            padding: 0.75rem;
-            border-radius: 12px;
+            flex: 1;
+            padding: 0.6rem;
+            border-radius: 10px;
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            color: #94a3b8;
-            font-weight: 600;
+            border: 1px solid #475569;
+            color: var(--muted);
+            font-size: 1.1rem;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .toggle-btn.active {
             background: rgba(59, 130, 246, 0.15);
-            border-color: var(--blue);
-            color: var(--blue);
+            border-color: #3b82f6;
+            color: #3b82f6;
         }
 
         .predict-btn {
@@ -667,7 +732,7 @@
             align-items: center;
             gap: 0.5rem;
             background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--glass-border);
+            border: 1px solid #475569;
             border-radius: 8px;
             padding: 0.5rem;
             cursor: pointer;
@@ -682,7 +747,7 @@
         }
 
         .disease-label {
-            font-size: 0.75rem;
+            font-size: 1.05rem;
             color: #94a3b8;
         }
 
@@ -808,7 +873,6 @@
         }
     </style>
 </head>
-
 <body>
     <div class="atmosphere">
         <div class="orb"
@@ -825,17 +889,21 @@
             </div>
         </a>
         <div class="nav-links">
-            <a href="/dashboard"><i data-lucide="layout-dashboard" size="18"></i> Dashboard</a>
-            <a href="/map" class="active"><i data-lucide="route" size="18"></i> Route Optimizer</a>
+            <button onclick="toggleTheme()" class="theme-toggle" style="background: transparent; border: 1px solid var(--glass-border); border-radius: 50%; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; color: var(--text); cursor: pointer; transition: all 0.2s; margin-right: 1rem;">
+                <i data-lucide="sun-moon" style="width: 26px; height: 26px;"></i>
+            </button>
+            <a href="/" class="active"><i data-lucide="home" size="26"></i> Home</a>
+            <a href="/dashboard"><i data-lucide="layout-dashboard" size="26"></i> Dashboard</a>
+            <a href="/map" class="active"><i data-lucide="route" size="26"></i> Route Optimizer</a>
         </div>
         <div style="display: flex; gap: 1rem; align-items: center;">
             <button class="profile-btn" onclick="openProfileModal()">
-                <i data-lucide="user" size="18"></i>
+                <i data-lucide="user" size="26"></i>
                 <span id="profileNameNav">Loading Profile...</span>
             </button>
             <button class="profile-btn" id="logoutBtn" style="display: none; padding: 0.6rem; aspect-ratio:1;"
                 onclick="window.location.href='/logout'" title="Logout">
-                <i data-lucide="log-out" size="18"></i>
+                <i data-lucide="log-out" size="26"></i>
             </button>
         </div>
     </nav>
@@ -844,8 +912,8 @@
         <div class="sidebar">
             <div class="sb-scroll">
                 <div>
-                    <div class="card-title"><i data-lucide="map" size="16"></i> Route AQI Optimizer</div>
-                    <p style="font-size: 0.78rem; color: var(--muted); line-height: 1.5;">Choose your starting and
+                    <div class="card-title"><i data-lucide="map" size="22"></i> Route AQI Optimizer</div>
+                    <p style="font-size: 1.1rem; color: var(--muted); line-height: 1.5;">Choose your starting and
                         ending station. We'll analyze air quality along possible road routes and recommend the
                         healthiest path.</p>
                 </div>
@@ -861,20 +929,20 @@
                     </select>
 
                     <button class="btn-main" id="btnAnalyse" disabled onclick="run()">
-                        <i data-lucide="search" size="18"></i> Analyse Routes
+                        <i data-lucide="search" size="26"></i> Analyse Routes
                     </button>
                 </div>
 
                 <div class="steps-wrap" id="stepsWrap">
-                    <div class="step" id="s1"><i data-lucide="circle-dot" size="14" id="s1i"></i><span id="s1t">Loading
+                    <div class="step" id="s1"><i data-lucide="circle-dot" size="20" id="s1i"></i><span id="s1t">Loading
                             station data…</span></div>
-                    <div class="step" id="s2"><i data-lucide="route" size="14" id="s2i"></i><span id="s2t">Finding
+                    <div class="step" id="s2"><i data-lucide="route" size="20" id="s2i"></i><span id="s2t">Finding
                             possible routes…</span></div>
-                    <div class="step" id="s3"><i data-lucide="map-pin" size="14" id="s3i"></i><span id="s3t">Drawing
+                    <div class="step" id="s3"><i data-lucide="map-pin" size="20" id="s3i"></i><span id="s3t">Drawing
                             routes on map…</span></div>
-                    <div class="step" id="s4"><i data-lucide="radio" size="14" id="s4i"></i><span id="s4t">Analysing air
+                    <div class="step" id="s4"><i data-lucide="radio" size="20" id="s4i"></i><span id="s4t">Analysing air
                             quality…</span></div>
-                    <div class="step" id="s5"><i data-lucide="lightbulb" size="14" id="s5i"></i><span
+                    <div class="step" id="s5"><i data-lucide="lightbulb" size="20" id="s5i"></i><span
                             id="s5t">Recommending best route…</span></div>
                 </div>
 
@@ -923,14 +991,21 @@
                 </div>
             </div>
 
-            <label class="field-label" style="margin-top:1.5rem;">Pre-existing Conditions</label>
-            <div class="disease-grid" id="diseaseGrid"></div>
+            <label class="field-label" style="margin-top:1.5rem; color:#fca311;"><i data-lucide="activity"
+                    size="14"></i> Chronic Conditions</label>
+            <div class="disease-grid" id="chronicGrid" style="margin-bottom: 1.5rem;"></div>
+
+            <label class="field-label" style="color:#3b82f6;"><i data-lucide="thermometer" size="14"></i> Temporary
+                Conditions</label>
+            <div class="disease-grid" id="tempGrid"></div>
 
             <button class="predict-btn" style="margin-top:2rem;" onclick="saveProfile()">
                 <i data-lucide="save" size="18"></i> Save Profile
             </button>
         </div>
     </div>
+
+
 
     <!-- Inject profile boolean -->
     <meta id="metaProfileComplete" data-complete="{{ 'true' if profile_complete else 'false' }}">
@@ -975,20 +1050,39 @@
                 if (prof.name) document.getElementById('logoutBtn').style.display = 'flex';
                 window.userProfileCache = prof;
                 if (prof.name) {
-                    document.getElementById('p_name').value = prof.name;
-                    document.getElementById('p_age').value = (prof.age && prof.age !== '—') ? prof.age : '';
+                    const pNameField = document.getElementById('p_name');
+                    const pAgeField = document.getElementById('p_age');
+                    if (pNameField) { pNameField.value = prof.name; pNameField.readOnly = true; }
+                    if (pAgeField) { pAgeField.value = (prof.age && prof.age !== '—') ? prof.age : ''; pAgeField.readOnly = true; }
 
                     // Build grid AFTER setting age
                     buildDiseaseGrid();
 
-                    if (prof.gender) selectToggle('genderGroup', document.querySelector(`#genderGroup button:contains('${prof.gender}')`), prof.gender);
-                    if (prof.smoker) selectToggle('smokerGroup', document.querySelector(`#smokerGroup button[onclick*="'${prof.smoker}'"]`), prof.smoker);
-                    if (prof.conditions) prof.conditions.forEach(c => {
-                        // SKIP Elderly and Children!
-                        if (c === 'Elderly' || c === 'Children') return;
-                        const box = [...document.querySelectorAll('.disease-box')].find(b => b.dataset.val === c);
-                        if (box) box.classList.add('selected');
-                    });
+                    if (prof.gender) {
+                        const genderBtn = Array.from(document.querySelectorAll('#genderGroup button')).find(b => b.textContent.trim().toLowerCase() === prof.gender.toLowerCase());
+                        if (genderBtn) selectToggle('genderGroup', genderBtn, prof.gender);
+                    }
+
+                    document.querySelectorAll('#genderGroup .toggle-btn').forEach(b => b.style.pointerEvents = 'none');
+
+                    if (prof.smoker) {
+                        const smokerBtn = Array.from(document.querySelectorAll('#smokerGroup button')).find(b => b.textContent.trim().toLowerCase() === prof.smoker.toLowerCase());
+                        if (smokerBtn) selectToggle('smokerGroup', smokerBtn, prof.smoker);
+                    }
+                    if (prof.chronic_conditions) {
+                        prof.chronic_conditions.forEach(c => {
+                            if (c === 'Elderly' || c === 'Children') return;
+                            const box = [...document.querySelectorAll('.chronic-box')].find(b => b.dataset.val === c);
+                            if (box) box.classList.add('selected');
+                        });
+                    }
+                    if (prof.temp_conditions) {
+                        prof.temp_conditions.forEach(c => {
+                            if (c === 'Elderly' || c === 'Children') return;
+                            const box = [...document.querySelectorAll('.temp-box')].find(b => b.dataset.val === c);
+                            if (box) box.classList.add('selected');
+                        });
+                    }
                 } else {
                     buildDiseaseGrid();
                 }
@@ -1140,34 +1234,34 @@
                 <div style="cursor:pointer" onclick="selectCard(${ri})">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <span class="m-name">Route ${String.fromCharCode(65 + ri)}</span>
-                        ${isRec ? '<span style="font-size:0.65rem; background:rgba(139, 92, 246, 0.2); color:#a78bfa; padding:0.25rem 0.6rem; border-radius:10px; font-weight:700;">RECOMMENDED</span>' : ''}
+                        ${isRec ? '<span style="font-size:0.85rem; background:rgba(139, 92, 246, 0.2); color:#a78bfa; padding:0.25rem 0.6rem; border-radius:10px; font-weight:700;">RECOMMENDED</span>' : ''}
                     </div>
                     <div class="m-aqi">
                         <span class="val" style="color:${aqiData.color}">${aqiData.avg_aqi}</span>
-                        <span style="color:var(--muted); font-size:0.75rem;">Avg AQI (${aqiData.severity})</span>
+                        <span style="color:var(--muted); font-size:1.0rem;">Avg AQI (${aqiData.severity})</span>
                     </div>
                 </div>
                 <div class="rcard-body ${isRec ? 'open' : ''}" id="rb_${ri}" style="margin-top:1rem; display:${isRec ? 'block' : 'none'}">
                     <div style="border-top:1px solid rgba(255,255,255,0.05); padding-top:1rem; margin-top:1rem;">
-                        <div style="font-size:0.7rem; font-weight:700; color:var(--muted); margin-bottom:0.75rem; letter-spacing:1px; text-transform:uppercase;">Stations En Route</div>
-                        <div style="display:flex; flex-direction:column; gap:0.4rem;">
+                        <div style="font-size:1.0rem; font-weight:900; color:var(--muted); margin-bottom:0.75rem; letter-spacing:1px; text-transform:uppercase;">Stations En Route</div>
+                        <div style="display:flex; flex-direction:column; gap:0.6rem;">
                             ${aqiData.stations.map(s => {
                 let icon = `<div style="width:6px;height:6px;border-radius:50%;background:${s.color}"></div>`;
-                if (s.is_from) icon = `<i data-lucide="map-pin" size="12" style="color:#3b82f6"></i>`;
-                else if (s.is_to) icon = `<i data-lucide="flag" size="12" style="color:#ef4444"></i>`;
+                if (s.is_from) icon = `<i data-lucide="map-pin" size="14" style="color:#3b82f6"></i>`;
+                else if (s.is_to) icon = `<i data-lucide="flag" size="14" style="color:#ef4444"></i>`;
                 return `
-                                    <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.02); padding:0.4rem 0.75rem; border-radius:10px;">
+                                    <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.02); padding:0.6rem 0.75rem; border-radius:10px;">
                                         <div style="display:flex; align-items:center; gap:0.6rem; overflow:hidden;">
                                             ${icon}
-                                            <span style="font-size:0.75rem; color:#e2e8f0; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">${s.station}</span>
+                                            <span style="font-size:1.1rem; color:var(--text); white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">${s.station}</span>
                                         </div>
-                                        <span style="font-size:0.7rem; font-weight:700; color:${s.color}">${Math.round(s.aqi) || '--'}</span>
+                                        <span style="font-size:1.1rem; font-weight:800; color:${s.color}">${Math.round(s.aqi) || '--'}</span>
                                     </div>
                                 `;
             }).join('')}
                         </div>
                     </div>
-                    <div class="rcard-foot" style="display:flex; gap:1rem; font-size:0.7rem; border-top:1px solid var(--glass-border); padding-top:1rem; margin-top:1rem; color:var(--muted);">
+                    <div class="rcard-foot" style="display:flex; gap:1rem; font-size:1.0rem; border-top:1px solid var(--glass-border); padding-top:1rem; margin-top:1rem; color:var(--muted);">
                         <span>Best: <b style="color:${aqiData.best.color}">${aqiData.best.aqi}</b></span>
                         <span>Worst: <b style="color:${aqiData.worst.color}">${aqiData.worst.aqi}</b></span>
                     </div>
@@ -1303,21 +1397,21 @@
                             
                             <div class="prec-list" style="display:flex; flex-direction:column; gap:0.6rem;">
                                 ${res.precautions.map(p => {
-                            return `<div class="prec-item" style="padding:1rem 1.25rem; font-size:0.85rem; border-radius:14px; background:rgba(139, 92, 246, 0.05); border-left:4px solid #a78bfa; display:flex; align-items:flex-start; gap:0.5rem;"><span style="color:#a78bfa; font-weight:900;">›</span><div style="flex:1">${p}</div></div>`;
+                            return `<div class="prec-item" style="padding:1.25rem 1.4rem; font-size:1.3rem; line-height: 1.6; border-radius:14px; background:rgba(139, 92, 246, 0.05); border-left:4px solid #a78bfa; display:flex; align-items:flex-start; gap:0.5rem;"><span style="color:#a78bfa; font-weight:900;">›</span><div style="flex:1">${p}</div></div>`;
                         }).join('')}
                             </div>
                             
                             <div style="margin-top: 1.5rem; margin-bottom: 0.5rem; padding: 0.8rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); border-radius: 12px;">
-                                <div style="font-size: 0.75rem; font-weight: 600; color: var(--muted); margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.4rem;">
-                                    <i data-lucide="info" size="14"></i> AQI Color Legend
+                                <div style="font-size: 1.05rem; font-weight: 600; color: var(--muted); margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.4rem;">
+                                    <i data-lucide="info" size="16"></i> AQI Color Legend
                                 </div>
                                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                                    <div style="display:flex; align-items:center; gap:4px; font-size:0.7rem;"><span style="width:8px; height:8px; border-radius:50%; background:#10b981;"></span> Good</div>
-                                    <div style="display:flex; align-items:center; gap:4px; font-size:0.7rem;"><span style="width:8px; height:8px; border-radius:50%; background:#84cc16;"></span> Satisfactory</div>
-                                    <div style="display:flex; align-items:center; gap:4px; font-size:0.7rem;"><span style="width:8px; height:8px; border-radius:50%; background:#eab308;"></span> Moderate</div>
-                                    <div style="display:flex; align-items:center; gap:4px; font-size:0.7rem;"><span style="width:8px; height:8px; border-radius:50%; background:#f59e0b;"></span> Poor</div>
-                                    <div style="display:flex; align-items:center; gap:4px; font-size:0.7rem;"><span style="width:8px; height:8px; border-radius:50%; background:#ef4444;"></span> Very Poor</div>
-                                    <div style="display:flex; align-items:center; gap:4px; font-size:0.7rem;"><span style="width:8px; height:8px; border-radius:50%; background:#b91c1c;"></span> Severe</div>
+                                    <div style="display:flex; align-items:center; gap:4px; font-size:1.0rem;"><span style="width:10px; height:10px; border-radius:50%; background:#16a34a;"></span> Good</div>
+                                    <div style="display:flex; align-items:center; gap:4px; font-size:1.0rem;"><span style="width:10px; height:10px; border-radius:50%; background:#65a30d;"></span> Satisfactory</div>
+                                    <div style="display:flex; align-items:center; gap:4px; font-size:1.0rem;"><span style="width:10px; height:10px; border-radius:50%; background:#d97706;"></span> Moderately Polluted</div>
+                                    <div style="display:flex; align-items:center; gap:4px; font-size:1.0rem;"><span style="width:10px; height:10px; border-radius:50%; background:#ea580c;"></span> Poor</div>
+                                    <div style="display:flex; align-items:center; gap:4px; font-size:1.0rem;"><span style="width:10px; height:10px; border-radius:50%; background:#dc2626;"></span> Very Poor</div>
+                                    <div style="display:flex; align-items:center; gap:4px; font-size:1.0rem;"><span style="width:10px; height:10px; border-radius:50%; background:#7c3aed;"></span> Severe</div>
                                 </div>
                             </div>
                         `;
@@ -1348,114 +1442,156 @@
             document.getElementById('profileModal').classList.remove('open');
         }
 
-        const ALL_CONDITIONS = [
+        const CHRONIC_CONDITIONS = [
             "Asthma", "COPD", "Chronic Bronchitis", "Emphysema", "Pulmonary Fibrosis",
-            "Lung Cancer", "Pneumonia History", "Cough", "Cold / Flu", "Throat Irritation",
-            "Breathing Difficulty", "Allergies", "Rhinitis / Sinusitis", "Dust Sensitivity",
-            "Heart Disease", "Hypertension", "Pregnant Women", "Elderly", "Children",
-            "None of the above"
+            "Lung Cancer", "Pneumonia History", "Heart Disease", "Hypertension", "Allergies",
+            "Dust Sensitivity", "Pregnant Women", "Elderly", "Children",
+            "Other (Type to Search)"
+        ];
+        const TEMPORARY_CONDITIONS = [
+            "Cough", "Cold / Flu", "Throat Irritation", "Breathing Difficulty", "Rhinitis / Sinusitis",
+            "Other (Type to Search)"
         ];
 
         function buildDiseaseGrid() {
-            const grid = document.getElementById('diseaseGrid');
+            const chronicGrid = document.getElementById('chronicGrid');
+            const tempGrid = document.getElementById('tempGrid');
             const age = parseInt(document.getElementById('p_age').value) || 0;
-            grid.innerHTML = '';
+            chronicGrid.innerHTML = '';
+            tempGrid.innerHTML = '';
 
-            ALL_CONDITIONS.forEach(d => {
-                const box = document.createElement('div');
-                box.className = 'disease-box';
-                box.dataset.val = d;
+            const renderConditions = (conditionsList, targetGrid, isChronic) => {
+                conditionsList.forEach(d => {
+                    const box = document.createElement('div');
+                    box.className = 'disease-box';
+                    if (isChronic) box.classList.add('chronic-box');
+                    else box.classList.add('temp-box');
+                    box.dataset.val = d;
 
-                // Smart Age Logic: Auto-select and LOCK
-                let isSelected = false;
-                if (d === 'Elderly' && age > 60) isSelected = true;
-                if (d === 'Children' && age < 12 && age > 0) isSelected = true;
+                    let isSelected = false;
+                    if (d === 'Elderly' && age > 60) isSelected = true;
+                    if (d === 'Children' && age < 12 && age > 0) isSelected = true;
 
-                // STRICT LOCK: These are always readonly as they are age-based
-                if (d === 'Elderly' || d === 'Children') {
-                    box.classList.add('readonly');
-                    if (isSelected) {
+                    if (d === 'Elderly' || d === 'Children') {
+                        box.classList.add('readonly');
+                        if (isSelected) box.classList.add('selected');
+                    } else if (isSelected) {
                         box.classList.add('selected');
-                    } else {
-                        box.classList.remove('selected');
-                    }
-                } else {
-                    if (isSelected) {
-                        box.classList.add('selected');
-                    } else {
-                        box.classList.remove('selected');
-                    }
-                }
-
-                box.innerHTML = `<i data-lucide="check-square" size="16" class="chk-icon" style="opacity:0.3"></i> <span class="disease-label">${d}</span>`;
-
-                box.addEventListener('click', () => {
-                    if (box.classList.contains('readonly')) return;
-
-                    // Mutual Exclusivity: Elderly vs Children (Manual part, though age locks them)
-                    if (d === 'Elderly') {
-                        const childBox = Array.from(grid.querySelectorAll('.disease-box')).find(b => b.dataset.val === 'Children');
-                        if (childBox) childBox.classList.remove('selected');
-                    } else if (d === 'Children') {
-                        const elderBox = Array.from(grid.querySelectorAll('.disease-box')).find(b => b.dataset.val === 'Elderly');
-                        if (elderBox) elderBox.classList.remove('selected');
                     }
 
-                    if (d === 'None of the above') {
-                        const isSelectingNone = !box.classList.contains('selected');
-                        if (isSelectingNone) {
-                            // Select None, deselect all others (except readonly)
-                            grid.querySelectorAll('.disease-box').forEach(b => {
-                                if (b.dataset.val !== 'None of the above' && !b.classList.contains('readonly')) {
-                                    b.classList.remove('selected');
-                                    b.style.pointerEvents = 'none';
-                                    b.style.opacity = '0.5';
+                    box.innerHTML = `<i data-lucide="${d === 'Other (Type to Search)' ? 'plus-square' : 'check-square'}" size="16" class="chk-icon" style="opacity:${d === 'Other (Type to Search)' ? '0.7' : '0.3'}"></i> <span class="disease-label">${d}</span>`;
+
+                    if (d === 'Other (Type to Search)') {
+                        box.addEventListener('click', async () => {
+                            if (box.classList.contains('readonly')) return;
+
+                            const { value: text } = await Swal.fire({
+                                title: 'Describe your condition',
+                                input: 'text',
+                                inputPlaceholder: 'e.g., Sleep Apnea',
+                                showCancelButton: true,
+                                confirmButtonText: 'Suggest Match',
+                                background: '#1e293b',
+                                color: '#fff'
+                            });
+
+                            if (text) {
+                                Swal.fire({title: 'Finding closest match...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading(), background: '#1e293b', color: '#fff'});
+                                try {
+                                    const res = await fetch('/api/suggest-condition', {
+                                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                                        body: JSON.stringify({ description: text })
+                                    });
+                                    const data = await res.json();
+                                    
+                                    if (data.suggestion) {
+                                        Swal.fire({
+                                            title: 'Based on your input:',
+                                            text: `Did you mean "${data.suggestion}"?`,
+                                            icon: 'question',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'Yes, add it',
+                                            background: '#1e293b',
+                                            color: '#fff'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                let targetBox = Array.from(targetGrid.querySelectorAll('.disease-box')).find(b => b.dataset.val === data.suggestion);
+                                                
+                                                if (targetBox) {
+                                                    targetBox.style.pointerEvents = 'auto';
+                                                    targetBox.style.opacity = '1';
+                                                    targetBox.classList.add('selected');
+                                                } else {
+                                                    targetGrid.querySelectorAll('.disease-box').forEach(b => {
+                                                        b.style.pointerEvents = 'auto';
+                                                        b.style.opacity = '1';
+                                                    });
+                                                
+                                                    const customBox = document.createElement('div');
+                                                    customBox.className = 'disease-box selected ' + (isChronic ? 'chronic-box' : 'temp-box');
+                                                    customBox.dataset.val = data.suggestion;
+                                                    customBox.innerHTML = `<i data-lucide="check-square" size="16" class="chk-icon" style="opacity:0.3"></i> <span class="disease-label">${data.suggestion}</span>`;
+                                                    
+                                                    customBox.addEventListener('click', () => customBox.classList.toggle('selected'));
+                                                    
+                                                    targetGrid.insertBefore(customBox, box);
+                                                    lucide.createIcons({ root: customBox });
+                                                }
+                                            }
+                                        });
+                                    } else {
+                                        Swal.fire({ title: 'Error', text: 'Could not categorize condition.', icon: 'error', background: '#1e293b', color: '#fff' });
+                                    }
+                                } catch (e) {
+                                    Swal.close();
                                 }
-                            });
-                            box.classList.add('selected');
-                        } else {
-                            // Deselect None, re-enable others
-                            grid.querySelectorAll('.disease-box').forEach(b => {
-                                b.style.pointerEvents = 'auto';
-                                b.style.opacity = '1';
-                            });
-                            box.classList.remove('selected');
+                            }
+                        });
+                        targetGrid.appendChild(box);
+                        return;
+                    }
+
+                    box.addEventListener('click', () => {
+                        if (box.classList.contains('readonly')) return;
+
+                        if (isChronic) {
+                            if (d === 'Elderly') {
+                                const childBox = Array.from(targetGrid.querySelectorAll('.disease-box')).find(b => b.dataset.val === 'Children');
+                                if (childBox) childBox.classList.remove('selected');
+                            } else if (d === 'Children') {
+                                const elderBox = Array.from(targetGrid.querySelectorAll('.disease-box')).find(b => b.dataset.val === 'Elderly');
+                                if (elderBox) elderBox.classList.remove('selected');
+                            }
                         }
-                    } else {
-                        // If any other is selected, ensure 'None' is deselected
-                        const noneBox = Array.from(grid.querySelectorAll('.disease-box')).find(b => b.dataset.val === 'None of the above');
-                        if (noneBox) noneBox.classList.remove('selected');
+
                         box.classList.toggle('selected');
-                    }
-                });
-                grid.appendChild(box);
-            });
+                    });
 
-            // Initial state for 'None'
-            const noneBox = Array.from(grid.querySelectorAll('.disease-box')).find(b => b.dataset.val === 'None of the above');
-            if (noneBox && noneBox.classList.contains('selected')) {
-                grid.querySelectorAll('.disease-box').forEach(b => {
-                    if (b.dataset.val !== 'None of the above') {
-                        b.style.pointerEvents = 'none';
-                        b.style.opacity = '0.5';
-                    }
+                    targetGrid.appendChild(box);
                 });
-            }
+            };
 
-            lucide.createIcons({ root: grid });
+            renderConditions(CHRONIC_CONDITIONS, chronicGrid, true);
+            renderConditions(TEMPORARY_CONDITIONS, tempGrid, false);
+            lucide.createIcons({ root: chronicGrid });
+            lucide.createIcons({ root: tempGrid });
         }
 
         // Auto-refresh grid when age changes
         document.getElementById('p_age').addEventListener('input', () => {
-            const currentSelected = [...document.querySelectorAll('.disease-box.selected')].map(b => b.dataset.val);
+            const currentSelectedChronic = [...document.querySelectorAll('.chronic-box.selected')].map(b => b.dataset.val);
+            const currentSelectedTemp = [...document.querySelectorAll('.temp-box.selected')].map(b => b.dataset.val);
             const age = parseInt(document.getElementById('p_age').value) || 0;
 
             // Clean up restoration list for mutual exclusivity
-            let filteredSelected = currentSelected.filter(v => v !== 'Elderly' && v !== 'Children');
+            let filteredSelectedChronic = currentSelectedChronic.filter(v => v !== 'Elderly' && v !== 'Children');
 
             buildDiseaseGrid();
-            document.querySelectorAll('.disease-box').forEach(b => {
-                if (filteredSelected.includes(b.dataset.val)) b.classList.add('selected');
+            document.querySelectorAll('.chronic-box').forEach(b => {
+                if (filteredSelectedChronic.includes(b.dataset.val)) b.classList.add('selected');
+            });
+            document.querySelectorAll('.temp-box').forEach(b => {
+                if (currentSelectedTemp.includes(b.dataset.val)) b.classList.add('selected');
             });
         });
 
@@ -1478,30 +1614,29 @@
             };
         })(document.querySelector);
 
-        async function saveProfile() {
-            const name = document.getElementById('p_name').value.trim();
-            const age = document.getElementById('p_age').value;
-            const gender = window.genderGroupVal;
+
+
+        async function saveProfile(silent = false) {
             const smoker = window.smokerGroupVal || 'No';
 
-            if (!name || !age || !gender) {
-                Swal.fire({ title: 'Incomplete', text: 'Please fill name, age, and gender.', icon: 'warning', background: '#1e293b', color: '#fff' });
-                return;
-            }
+            const chronic_conditions = [...document.querySelectorAll('.chronic-box.selected')]
+                .map(b => b.dataset.val);
 
-            const conditions = [...document.querySelectorAll('.disease-box.selected')]
-                .map(b => b.dataset.val)
-                .filter(v => v !== 'None of the above');
+            const temp_conditions = [...document.querySelectorAll('.temp-box.selected')]
+                .map(b => b.dataset.val);
 
             try {
-                const res = await fetch('/save-profile', {
+                const res = await fetch('/api/update-health', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, age, gender, smoker, conditions })
+                    body: JSON.stringify({ smoker, chronic_conditions, temp_conditions })
                 });
                 if (res.ok) {
-                    Swal.fire({ title: 'Saved', text: 'Profile updated successfully!', icon: 'success', background: '#1e293b', color: '#fff', timer: 1500, showConfirmButton: false });
-                    document.getElementById('profileNameNav').textContent = name;
-                    window.location.reload();
+                    if (!silent) {
+                        Swal.fire({ title: 'Saved', text: 'Health conditions updated successfully!', icon: 'success', background: '#1e293b', color: '#fff', timer: 1500, showConfirmButton: false });
+                        setTimeout(() => window.location.reload(), 1000);
+                    }
+                } else if (!silent) {
+                    Swal.fire({ title: 'Error', text: 'Failed to update', icon: 'error', background: '#1e293b', color: '#fff' });
                 }
             } catch (e) { }
         }
